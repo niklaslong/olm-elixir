@@ -1,8 +1,16 @@
 # Olm
 
-**TODO: Add description**
+Elixir wrapper for [Olm](https://gitlab.matrix.org/matrix-org/olm).
 
 ## Installation
+
+### Install Olm
+
+Olm is a native C library. The library is packaged by several distributions.
+
+On Debian one can install it like so:
+
+    apt install libolm-dev
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 by adding `olm` to your list of dependencies in `mix.exs`:
