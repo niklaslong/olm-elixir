@@ -2,7 +2,9 @@
 #include <olm/olm.h>
 #include <olm/outbound_group_session.h>
 #include <olm/inbound_group_session.h>
-//#include <olm/megolm.h>
+#include <olm/pk.h>
+#include <olm/sas.h>
+
 
 static ERL_NIF_TERM
 version(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
