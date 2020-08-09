@@ -24,3 +24,6 @@ olm-*.tar
 
 # Ignore shared object files
 *.so
+
+# Ignore VS code project configuration
+.vscode
