@@ -3,16 +3,11 @@ defmodule Olm do
   Documentation for `Olm`.
   """
 
-  @doc """
-  Hello world.
+  @on_load :load_nifs
 
-  ## Examples
+  def load_nifs(), do: :erlang.load_nif('priv/native/olm_nifs', 0)
 
-      iex> Olm.hello()
-      :world
+  def version(), do: error("version/0")
 
-  """
-  def hello do
-    :world
-  end
+  defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end
