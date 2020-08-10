@@ -1,10 +1,10 @@
 UNAME := $(shell uname -s)
 
+# Creates directory for object files.
+$(shell mkdir priv/native)
+
 ifeq ($(UNAME), Linux) 
 ERL_INCLUDE_PATH=$ERL_ROOT/usr/include/
-
-# Creates directory for object files.
-$(shell mkdir priv/native) 
 
 all::
 	cc -fPIC -shared -I$(ERL_INCLUDE_PATH) \
@@ -13,9 +13,6 @@ endif
 
 ifeq ($(UNAME), Darwin) 
 ERL_INCLUDE_PATH=$(ERL_ROOT)/include
-
-# Creates directory for object files.
-$(shell mkdir priv/native)
 
 all::
 	cc -fPIC -shared -I$(ERL_INCLUDE_PATH) \
