@@ -17,4 +17,8 @@ defmodule OlmTest do
   test "get session size" do
     assert is_integer(Olm.session_size())
   end
+
+  test "get utiliy size" do
+    assert is_integer(Olm.utility_size())
+  end
 end
