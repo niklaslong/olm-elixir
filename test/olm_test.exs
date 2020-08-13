@@ -9,4 +9,8 @@ defmodule OlmTest do
     assert is_integer(minor)
     assert is_integer(patch)
   end
+
+  test "get account size" do
+    assert is_integer(Olm.account_size())
+  end
 end

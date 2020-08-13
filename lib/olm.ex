@@ -9,5 +9,7 @@ defmodule Olm do
 
   def version(), do: error("version/0")
 
+  def account_size(), do: error("account_size/0")
+
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end

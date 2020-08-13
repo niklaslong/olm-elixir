@@ -5,7 +5,6 @@
 #include <olm/pk.h>
 #include <olm/sas.h>
 
-
 static ERL_NIF_TERM
 version(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
     uint8_t major, minor, patch;
@@ -17,10 +16,18 @@ version(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 			    enif_make_int(env, patch));
 }
 
+static ERL_NIF_TERM
+account_size(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+    size_t size = olm_account_size();
+	
+	return enif_make_ulong(env, size);
+}
+
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
-				 // {erl_function_name, erl_function_arity, c_function}
-				 {"version", 0, version}
+	// {erl_function_name, erl_function_arity, c_function}
+	{"version", 0, version},
+	{"account_size", 0, account_size}
 };
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, NULL, NULL, NULL, NULL)
