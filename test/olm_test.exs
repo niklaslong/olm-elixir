@@ -13,4 +13,8 @@ defmodule OlmTest do
   test "get account size" do
     assert is_integer(Olm.account_size())
   end
+
+  test "get session size" do
+    assert is_integer(Olm.session_size())
+  end
 end
