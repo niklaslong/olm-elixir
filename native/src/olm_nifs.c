@@ -39,9 +39,9 @@ utility_size(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
-	// {erl_function_name, erl_function_arity, c_function}
-	{"version", 0, version},
-	{"account_size", 0, account_size},
+    // {erl_function_name, erl_function_arity, c_function}
+    {"version", 0, version},
+    {"account_size", 0, account_size},
     {"session_size", 0, session_size}, 
     {"utility_size", 0, utility_size}
 };
