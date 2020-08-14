@@ -12,9 +12,9 @@ version(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   olm_get_library_version(&major, &minor, &patch);
 
   return enif_make_tuple3(env,
-                          enif_make_int(env, major),
-                          enif_make_int(env, minor),
-                          enif_make_int(env, patch));
+                          enif_make_uint(env, major),
+                          enif_make_uint(env, minor),
+                          enif_make_uint(env, patch));
 }
 
 static ERL_NIF_TERM
