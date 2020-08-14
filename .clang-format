@@ -1,6 +1,5 @@
 ---
 Language:        Cpp
-# BasedOnStyle:  Mozilla
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
 AlignConsecutiveMacros: false
@@ -82,7 +81,7 @@ IncludeIsMainSourceRegex: ''
 IndentCaseLabels: true
 IndentGotoLabels: true
 IndentPPDirectives: None
-IndentWidth:     2
+IndentWidth:     4
 IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
@@ -134,3 +133,4 @@ TabWidth:        8
 UseCRLF:         false
 UseTab:          Never
 ...
+
