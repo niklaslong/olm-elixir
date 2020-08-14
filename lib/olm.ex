@@ -23,9 +23,9 @@ defmodule Olm do
   def session_size(), do: error("session_size/0")
 
   @doc """
-  The size of an utiliy object in bytes.
+  The size of an utility object in bytes.
   """
-  def utility_size(), do: error("utiliy_size/0")
+  def utility_size(), do: error("utility_size/0")
 
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end
