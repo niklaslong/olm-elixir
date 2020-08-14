@@ -8,7 +8,8 @@ defmodule Olm.MixProject do
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      compilers: [:olm_nifs] ++ Mix.compilers()
+      compilers: [:olm_nifs] ++ Mix.compilers(),
+      aliases: aliases()
     ]
   end
 
@@ -25,6 +26,10 @@ defmodule Olm.MixProject do
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
+  end
+
+  defp aliases do
+    [fmt: ["format", "cmd clang-format -i native/src/*.[ch]"]]
   end
 end
 
