@@ -41,12 +41,27 @@ utility_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_ulong(env, size);
 }
 
+static ERL_NIF_TERM
+init_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    size_t size = olm_account_size();
+
+    // Also works with malloc
+    OlmAccount* memory  = enif_alloc(size);
+    OlmAccount* account = olm_account(memory);
+
+    ERL_NIF_TERM term = enif_make_resource(env, &account);
+
+    return term;
+}
+
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
     {"version", 0, version},
     {"account_size", 0, account_size},
     {"session_size", 0, session_size},
-    {"utility_size", 0, utility_size}};
+    {"utility_size", 0, utility_size},
+    {"init_account", 0, init_account}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, NULL, NULL, NULL, NULL)
