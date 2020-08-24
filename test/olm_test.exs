@@ -21,4 +21,8 @@ defmodule OlmTest do
   test "get utiliy size" do
     assert is_integer(Olm.utility_size())
   end
+
+  test "initiliase an account" do
+    assert is_reference(Olm.init_account(Olm.account_size()))
+  end
 end

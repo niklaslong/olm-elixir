@@ -44,9 +44,9 @@ utility_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 static ERL_NIF_TERM
 init_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
-    size_t size = olm_account_size();
+    size_t size = argv[0];
 
-    // Also works with malloc
+    // BEAM specific impl of malloc, won't be GC and needs to be freed.
     OlmAccount* memory  = enif_alloc(size);
     OlmAccount* account = olm_account(memory);
 
@@ -62,6 +62,6 @@ static ErlNifFunc nif_funcs[] = {
     {"account_size", 0, account_size},
     {"session_size", 0, session_size},
     {"utility_size", 0, utility_size},
-    {"init_account", 0, init_account}};
+    {"init_account", 1, init_account}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, NULL, NULL, NULL, NULL)
