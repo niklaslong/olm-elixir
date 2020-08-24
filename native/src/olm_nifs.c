@@ -5,6 +5,28 @@
 #include <olm/pk.h>
 #include <olm/sas.h>
 
+static ErlNifResourceType* account_resource;
+static ErlNifResourceType* session_resource;
+static ErlNifResourceType* utility_resource;
+
+// Not sure about the destructors yet.
+// Maybe we need to wrap olm_clear_* ?
+static int
+nif_load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info)
+{
+    int flags        = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
+    account_resource = enif_open_resource_type(
+        env, NULL, "account", olm_clear_account, flags, NULL);
+
+    session_resource = enif_open_resource_type(
+        env, NULL, "session", olm_clear_session, flags, NULL);
+
+    utility_resource = enif_open_resource_type(
+        env, NULL, "utility", olm_clear_utility, flags, NULL);
+
+    return 0;
+}
+
 static ERL_NIF_TERM
 version(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
@@ -46,8 +68,7 @@ init_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     size_t account_size = argv[0];
 
-    // BEAM specific impl of malloc, won't be GC and needs to be freed.
-    OlmAccount* memory  = enif_alloc(account_size);
+    OlmAccount* memory  = enif_alloc_resource(account_resource, account_size);
     OlmAccount* account = olm_account(memory);
 
     return enif_make_resource(env, &account);
@@ -58,7 +79,7 @@ init_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     size_t session_size = argv[0];
 
-    OlmSession* memory  = enif_alloc(session_size);
+    OlmSession* memory  = enif_alloc_resource(session_resource, session_size);
     OlmSession* session = olm_session(memory);
 
     return enif_make_resource(env, &session);
@@ -69,10 +90,19 @@ init_utility(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     size_t utility_size = argv[0];
 
-    OlmUtility* memory  = enif_alloc(utility_size);
+    OlmUtility* memory  = enif_alloc_resource(utility_resource, utility_size);
     OlmUtility* utility = olm_utility(memory);
 
     return enif_make_resource(env, &utility);
+}
+
+static ERL_NIF_TERM
+create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    return enif_make_atom(env, "ok");
 }
 
 // Let's define the array of ErlNifFunc beforehand:
@@ -84,6 +114,7 @@ static ErlNifFunc nif_funcs[] = {
     {"utility_size", 0, utility_size},
     {"init_account", 1, init_account},
     {"init_session", 1, init_session},
-    {"init_utility", 1, init_utility}};
+    {"init_utility", 1, init_utility},
+    {"create_account", 1, create_account}};
 
-ERL_NIF_INIT(Elixir.Olm, nif_funcs, NULL, NULL, NULL, NULL)
+ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)
