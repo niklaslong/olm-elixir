@@ -29,5 +29,9 @@ defmodule Olm do
 
   def init_account(_account_size), do: error("init_account/1")
 
+  def init_session(_session_size), do: error("init_session/1")
+
+  def init_utility(_utility_size), do: error("init_utility/1")
+
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end

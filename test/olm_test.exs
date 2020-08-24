@@ -25,4 +25,12 @@ defmodule OlmTest do
   test "initiliase an account" do
     assert is_reference(Olm.init_account(Olm.account_size()))
   end
+
+  test "initiliase a session" do
+    assert is_reference(Olm.init_session(Olm.session_size()))
+  end
+
+  test "initiliase a utility" do
+    assert is_reference(Olm.init_utility(Olm.utility_size()))
+  end
 end

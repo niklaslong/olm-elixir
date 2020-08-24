@@ -44,15 +44,35 @@ utility_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 static ERL_NIF_TERM
 init_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
-    size_t size = argv[0];
+    size_t account_size = argv[0];
 
     // BEAM specific impl of malloc, won't be GC and needs to be freed.
-    OlmAccount* memory  = enif_alloc(size);
+    OlmAccount* memory  = enif_alloc(account_size);
     OlmAccount* account = olm_account(memory);
 
-    ERL_NIF_TERM term = enif_make_resource(env, &account);
+    return enif_make_resource(env, &account);
+}
 
-    return term;
+static ERL_NIF_TERM
+init_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    size_t session_size = argv[0];
+
+    OlmSession* memory  = enif_alloc(session_size);
+    OlmSession* session = olm_session(memory);
+
+    return enif_make_resource(env, &session);
+}
+
+static ERL_NIF_TERM
+init_utility(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    size_t utility_size = argv[0];
+
+    OlmUtility* memory  = enif_alloc(utility_size);
+    OlmUtility* utility = olm_utility(memory);
+
+    return enif_make_resource(env, &utility);
 }
 
 // Let's define the array of ErlNifFunc beforehand:
@@ -62,6 +82,8 @@ static ErlNifFunc nif_funcs[] = {
     {"account_size", 0, account_size},
     {"session_size", 0, session_size},
     {"utility_size", 0, utility_size},
-    {"init_account", 1, init_account}};
+    {"init_account", 1, init_account},
+    {"init_session", 1, init_session},
+    {"init_utility", 1, init_utility}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, NULL, NULL, NULL, NULL)
