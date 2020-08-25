@@ -50,5 +50,10 @@ defmodule Olm do
   """
   def account_last_error(_account_ref), do: error("account_last_error/1")
 
+  @doc """
+  Returns the number of bytes needed to store an account.
+  """
+  def pickle_account_length(_account_ref), do: error("pickle_account_length/1")
+
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end

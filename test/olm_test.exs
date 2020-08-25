@@ -49,4 +49,15 @@ defmodule OlmTest do
     assert is_list(charlist)
     assert 'SUCCESS' == charlist
   end
+
+  test "returns number of bytest needed to store an account" do
+    pickle_length =
+      Olm.account_size()
+      |> Olm.init_account()
+      |> Olm.pickle_account_length()
+
+    assert is_integer(pickle_length)
+    # Don't know if this value is consistent...
+    assert pickle_length == 246
+  end
 end

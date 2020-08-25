@@ -87,10 +87,10 @@ init_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     OlmAccount* memory  = enif_alloc_resource(account_resource, account_size);
     OlmAccount* account = olm_account(memory);
-    
-    ERL_NIF_TERM term = enif_make_resource(env, &account);
+
+    ERL_NIF_TERM term = enif_make_resource(env, account);
     enif_release_resource(account);
-    
+
     return term;
 }
 
@@ -102,7 +102,7 @@ init_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     OlmSession* memory  = enif_alloc_resource(session_resource, session_size);
     OlmSession* session = olm_session(memory);
 
-    return enif_make_resource(env, &session);
+    return enif_make_resource(env, session);
 }
 
 static ERL_NIF_TERM
@@ -113,7 +113,7 @@ init_utility(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     OlmUtility* memory  = enif_alloc_resource(utility_resource, utility_size);
     OlmUtility* utility = olm_utility(memory);
 
-    return enif_make_resource(env, &utility);
+    return enif_make_resource(env, utility);
 }
 
 static ERL_NIF_TERM
@@ -127,6 +127,17 @@ account_last_error(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_string(env, last_error, ERL_NIF_LATIN1);
 }
 
+static ERL_NIF_TERM
+pickle_account_length(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    size_t length = olm_pickle_account_length(account);
+
+    return enif_make_ulong(env, length);
+}
+
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
@@ -137,6 +148,7 @@ static ErlNifFunc nif_funcs[] = {
     {"init_account", 1, init_account},
     {"init_session", 1, init_session},
     {"init_utility", 1, init_utility},
-    {"account_last_error", 1, account_last_error}};
+    {"account_last_error", 1, account_last_error},
+    {"pickle_account_length", 1, pickle_account_length}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)
