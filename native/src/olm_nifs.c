@@ -10,19 +10,36 @@ static ErlNifResourceType* session_resource;
 static ErlNifResourceType* utility_resource;
 
 // Not sure about the destructors yet.
-// Maybe we need to wrap olm_clear_* ?
+void
+account_dtor(ErlNifEnv* caller_env, void* account)
+{
+    olm_clear_account(account);
+}
+
+void
+session_dtor(ErlNifEnv* caller_env, void* session)
+{
+    olm_clear_session(session);
+}
+
+void
+utility_dtor(ErlNifEnv* caller_env, void* utility)
+{
+    olm_clear_utility(utility);
+}
+
 static int
 nif_load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info)
 {
     int flags        = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
     account_resource = enif_open_resource_type(
-        env, NULL, "account", olm_clear_account, flags, NULL);
+        env, NULL, "account", account_dtor, flags, NULL);
 
     session_resource = enif_open_resource_type(
-        env, NULL, "session", olm_clear_session, flags, NULL);
+        env, NULL, "session", session_dtor, flags, NULL);
 
     utility_resource = enif_open_resource_type(
-        env, NULL, "utility", olm_clear_utility, flags, NULL);
+        env, NULL, "utility", utility_dtor, flags, NULL);
 
     return 0;
 }
@@ -70,8 +87,11 @@ init_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     OlmAccount* memory  = enif_alloc_resource(account_resource, account_size);
     OlmAccount* account = olm_account(memory);
-
-    return enif_make_resource(env, &account);
+    
+    ERL_NIF_TERM term = enif_make_resource(env, &account);
+    enif_release_resource(account);
+    
+    return term;
 }
 
 static ERL_NIF_TERM
@@ -97,12 +117,14 @@ init_utility(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+account_last_error(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     OlmAccount* account;
     enif_get_resource(env, argv[0], account_resource, (void**) &account);
 
-    return enif_make_atom(env, "ok");
+    const char* last_error = olm_account_last_error(account);
+
+    return enif_make_string(env, last_error, ERL_NIF_LATIN1);
 }
 
 // Let's define the array of ErlNifFunc beforehand:
@@ -115,6 +137,6 @@ static ErlNifFunc nif_funcs[] = {
     {"init_account", 1, init_account},
     {"init_session", 1, init_session},
     {"init_utility", 1, init_utility},
-    {"create_account", 1, create_account}};
+    {"account_last_error", 1, account_last_error}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)

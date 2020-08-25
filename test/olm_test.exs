@@ -23,14 +23,30 @@ defmodule OlmTest do
   end
 
   test "initiliase an account" do
-    assert is_reference(Olm.init_account(Olm.account_size()))
+    assert Olm.account_size()
+           |> Olm.init_account()
+           |> is_reference()
   end
 
   test "initiliase a session" do
-    assert is_reference(Olm.init_session(Olm.session_size()))
+    assert Olm.session_size()
+           |> Olm.init_session()
+           |> is_reference()
   end
 
   test "initiliase a utility" do
-    assert is_reference(Olm.init_utility(Olm.utility_size()))
+    assert Olm.utility_size()
+           |> Olm.init_utility()
+           |> is_reference()
+  end
+
+  test "returns the most recent error to happen to an account" do
+    charlist =
+      Olm.account_size()
+      |> Olm.init_account()
+      |> Olm.account_last_error()
+
+    assert is_list(charlist)
+    assert 'SUCCESS' == charlist
   end
 end

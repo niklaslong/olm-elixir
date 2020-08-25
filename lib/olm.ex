@@ -27,13 +27,28 @@ defmodule Olm do
   """
   def utility_size(), do: error("utility_size/0")
 
+  @doc """
+  Initialises an account object using the supplied memory.
+  The supplied memory must be at least `account_size/0` bytes.
+  """
   def init_account(_account_size), do: error("init_account/1")
 
+  @doc """
+  Initialises a session object using the supplied memory.
+  The supplied memory must be at least `session_size/0` bytes.
+  """
   def init_session(_session_size), do: error("init_session/1")
 
+  @doc """
+  Initialises a utility object using the supplied memory.
+  The supplied memory must be at least `utility_size/0` bytes.
+  """
   def init_utility(_utility_size), do: error("init_utility/1")
 
-  def create_account(_account_ref), do: error("create_account/1")
+  @doc """
+  A null terminated string describing the most recent error to happen to an account.
+  """
+  def account_last_error(_account_ref), do: error("account_last_error/1")
 
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end
