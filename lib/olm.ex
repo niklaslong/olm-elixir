@@ -55,5 +55,7 @@ defmodule Olm do
   """
   def pickle_account_length(_account_ref), do: error("pickle_account_length/1")
 
+  def pickle_account(_account_ref, _key, _key_length), do: error("pickle_account/3")
+
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end

@@ -138,6 +138,29 @@ pickle_account_length(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_ulong(env, length);
 }
 
+static ERL_NIF_TERM
+pickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    size_t key_length;
+    enif_get_ulong(env, argv[2], &key_length);
+
+    char key[key_length];
+    enif_get_string(env, argv[1], key, key_length, ERL_NIF_LATIN1);
+
+    // Move this to args?
+    size_t pickled_length = olm_pickle_account_length(account);
+
+    char pickled[pickled_length];
+    // We probably need some error handling here.
+    size_t res =
+        olm_pickle_account(account, key, key_length, pickled, pickled_length);
+
+    return enif_make_string(env, pickled, ERL_NIF_LATIN1);
+}
+
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
@@ -149,6 +172,7 @@ static ErlNifFunc nif_funcs[] = {
     {"init_session", 1, init_session},
     {"init_utility", 1, init_utility},
     {"account_last_error", 1, account_last_error},
-    {"pickle_account_length", 1, pickle_account_length}};
+    {"pickle_account_length", 1, pickle_account_length},
+    {"pickle_account", 3, pickle_account}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)

@@ -51,13 +51,23 @@ defmodule OlmTest do
   end
 
   test "returns number of bytest needed to store an account" do
-    pickle_length =
+    pickled_length =
       Olm.account_size()
       |> Olm.init_account()
       |> Olm.pickle_account_length()
 
-    assert is_integer(pickle_length)
+    assert is_integer(pickled_length)
     # Don't know if this value is consistent...
-    assert pickle_length == 246
+    assert pickled_length == 246
+  end
+
+  test "returns an account stored as an encrypted base64 string" do
+    pickled_account =
+      Olm.account_size()
+      |> Olm.init_account()
+      |> Olm.pickle_account('key', 4)
+
+    assert is_list(pickled_account)
+    assert length(pickled_account) == 246
   end
 end
