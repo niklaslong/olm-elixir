@@ -13,11 +13,6 @@ defmodule Olm do
   def version(), do: error("version/0")
 
   @doc """
-  The size of an account object in bytes.
-  """
-  def account_size(), do: error("account_size/0")
-
-  @doc """
   The size of an session object in bytes.
   """
   def session_size(), do: error("session_size/0")
@@ -26,6 +21,16 @@ defmodule Olm do
   The size of an utility object in bytes.
   """
   def utility_size(), do: error("utility_size/0")
+
+  @doc """
+  Creates a new account.
+  """
+  def create_account(), do: error("create_account/0")
+
+  @doc """
+  Returns the public parts of the identity keys for the account. 
+  """
+  def account_identity_keys(_account_ref), do: error("account_identity_keys/1")
 
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end
