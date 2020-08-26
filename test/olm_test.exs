@@ -22,6 +22,13 @@ defmodule OlmTest do
     assert is_reference(Olm.create_account())
   end
 
+  test "returns an account stored as an encrypted base64 string" do
+    pickled_account = Olm.create_account() |> Olm.pickle_account('key', 4)
+
+    assert is_list(pickled_account)
+    assert length(pickled_account) == 246
+  end
+
   test "returns the public parts of the identity keys for an account" do
     {:ok, keys} =
       Olm.create_account()

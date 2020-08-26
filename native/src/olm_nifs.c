@@ -72,6 +72,28 @@ create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
+pickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    size_t key_length;
+    enif_get_ulong(env, argv[2], &key_length);
+
+    char key[key_length];
+    enif_get_string(env, argv[1], key, key_length, ERL_NIF_LATIN1);
+
+    size_t pickled_length = olm_pickle_account_length(account);
+    char   pickled[pickled_length];
+
+    // Error handling needs to be added.
+    size_t res =
+        olm_pickle_account(account, key, key_length, pickled, pickled_length);
+
+    return enif_make_string(env, pickled, ERL_NIF_LATIN1);
+}
+
+static ERL_NIF_TERM
 account_idenitiy_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     OlmAccount* account;
@@ -92,6 +114,7 @@ static ErlNifFunc nif_funcs[] = {
     {"session_size", 0, session_size},
     {"utility_size", 0, utility_size},
     {"create_account", 0, create_account},
+    {"pickle_account", 3, pickle_account},
     {"account_identity_keys", 1, account_idenitiy_keys}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)

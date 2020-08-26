@@ -28,6 +28,11 @@ defmodule Olm do
   def create_account(), do: error("create_account/0")
 
   @doc """
+  Stores an account as a base64 string. Encrypts the account using the supplied key.
+  """
+  def pickle_account(_account_ref, _key, _key_length), do: error("pickle_account/3")
+
+  @doc """
   Returns the public parts of the identity keys for the account. 
   """
   def account_identity_keys(_account_ref), do: error("account_identity_keys/1")
