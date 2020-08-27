@@ -4,7 +4,6 @@
 #include <olm/outbound_group_session.h>
 #include <olm/pk.h>
 #include <olm/sas.h>
-#include <stdio.h>
 
 static ErlNifResourceType* account_resource;
 
