@@ -4,6 +4,7 @@
 #include <olm/outbound_group_session.h>
 #include <olm/pk.h>
 #include <olm/sas.h>
+#include <stdio.h>
 
 static ErlNifResourceType* account_resource;
 
@@ -52,6 +53,17 @@ utility_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
+account_last_error(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    const char* last_error = olm_account_last_error(account);
+
+    return enif_make_string(env, last_error, ERL_NIF_LATIN1);
+}
+
+static ERL_NIF_TERM
 create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     size_t account_size = olm_account_size();
@@ -77,20 +89,67 @@ pickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     OlmAccount* account;
     enif_get_resource(env, argv[0], account_resource, (void**) &account);
 
-    size_t key_length;
-    enif_get_ulong(env, argv[2], &key_length);
+    // size_t key_length;
+    // enif_get_ulong(env, argv[2], &key_length);
 
-    char key[key_length];
-    enif_get_string(env, argv[1], key, key_length, ERL_NIF_LATIN1);
+    // char key[key_length];
+    // enif_get_string(env, argv[1], key, key_length, ERL_NIF_LATIN1);
+
+    char   key[]      = "key";
+    size_t key_length = sizeof(key);
 
     size_t pickled_length = olm_pickle_account_length(account);
-    char   pickled[pickled_length];
+    // char   pickled[pickled_length];
+
+    ErlNifBinary pickled;
+    enif_alloc_binary(pickled_length, &pickled);
 
     // Error handling needs to be added.
-    size_t res =
-        olm_pickle_account(account, key, key_length, pickled, pickled_length);
+    size_t res = olm_pickle_account(
+        account, key, key_length, pickled.data, pickled_length);
 
-    return enif_make_string(env, pickled, ERL_NIF_LATIN1);
+    // printf("%s", pickled);
+
+    return enif_make_binary(env, &pickled);
+
+    // return enif_make_string(env, pickled, ERL_NIF_LATIN1);
+}
+
+static ERL_NIF_TERM
+unpickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    // size_t pickled_length;
+    // enif_get_ulong(env, argv[1], &pickled_length);
+
+    // char pickled_account[pickled_length];
+    // enif_get_string(env, argv[0], pickled_account, pickled_length,
+    // ERL_NIF_LATIN1);
+
+    // printf("%s", pickled_account);
+
+    ErlNifBinary pickled_account;
+    enif_inspect_binary(env, argv[0], &pickled_account);
+
+    // size_t key_length;
+    // enif_get_ulong(env, argv[3], &key_length);
+
+    // char key[key_length];
+    // enif_get_string(env, argv[2], key, key_length, ERL_NIF_LATIN1);
+
+    char   key[]      = "key";
+    size_t key_length = sizeof(key);
+
+    size_t      account_size = olm_account_size();
+    OlmAccount* memory  = enif_alloc_resource(account_resource, account_size);
+    OlmAccount* account = olm_account(memory);
+
+    olm_unpickle_account(account, key, key_length, pickled_account.data, 246);
+
+    ERL_NIF_TERM term = enif_make_resource(env, account);
+    enif_release_resource(account);
+
+    // return enif_make_string(env, last_error, ERL_NIF_LATIN1);
+    return term;
 }
 
 static ERL_NIF_TERM
@@ -111,10 +170,12 @@ account_idenitiy_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
     {"version", 0, version},
+    {"account_last_error", 1, account_last_error},
     {"session_size", 0, session_size},
     {"utility_size", 0, utility_size},
     {"create_account", 0, create_account},
     {"pickle_account", 3, pickle_account},
+    {"unpickle_account", 4, unpickle_account},
     {"account_identity_keys", 1, account_idenitiy_keys}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)

@@ -22,6 +22,8 @@ defmodule Olm do
   """
   def utility_size(), do: error("utility_size/0")
 
+  def account_last_error(_account_ref), do: error("account_last_error/1")
+
   @doc """
   Creates a new account.
   """
@@ -31,6 +33,9 @@ defmodule Olm do
   Stores an account as a base64 string. Encrypts the account using the supplied key.
   """
   def pickle_account(_account_ref, _key, _key_length), do: error("pickle_account/3")
+
+  def unpickle_account(_pickled_account, _pickled_length, _key, _key_length),
+    do: error("unpickle_account/3")
 
   @doc """
   Returns the public parts of the identity keys for the account. 
