@@ -36,22 +36,6 @@ version(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-session_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
-{
-    size_t size = olm_session_size();
-
-    return enif_make_ulong(env, size);
-}
-
-static ERL_NIF_TERM
-utility_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
-{
-    size_t size = olm_utility_size();
-
-    return enif_make_ulong(env, size);
-}
-
-static ERL_NIF_TERM
 account_last_error(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     OlmAccount* account;
@@ -148,8 +132,6 @@ static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
     {"version", 0, version},
     {"account_last_error", 1, account_last_error},
-    {"session_size", 0, session_size},
-    {"utility_size", 0, utility_size},
     {"create_account", 0, create_account},
     {"pickle_account", 2, pickle_account},
     {"unpickle_account", 2, unpickle_account},

@@ -13,16 +13,6 @@ defmodule Olm do
   def version(), do: error("version/0")
 
   @doc """
-  The size of an session object in bytes.
-  """
-  def session_size(), do: error("session_size/0")
-
-  @doc """
-  The size of an utility object in bytes.
-  """
-  def utility_size(), do: error("utility_size/0")
-
-  @doc """
   A null terminated string describing the most recent error to happen to a session.
   """
   def account_last_error(_account_ref), do: error("account_last_error/1")
