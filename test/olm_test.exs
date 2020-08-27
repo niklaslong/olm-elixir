@@ -22,11 +22,21 @@ defmodule OlmTest do
     assert is_reference(Olm.create_account())
   end
 
-  test "returns an account stored as an encrypted base64 string" do
-    pickled_account = Olm.create_account() |> Olm.pickle_account('key', 4)
+  test "encrypts an account stored as a base64 string" do
+    pickled_account = Olm.create_account() |> Olm.pickle_account("key")
 
-    assert is_list(pickled_account)
-    assert length(pickled_account) == 246
+    assert is_binary(pickled_account)
+    assert String.length(pickled_account) == 246
+  end
+
+  test "decrypts an account stored as a base64 string" do
+    pickled_account =
+      "pZeOezYWRpPNM5QzdxevG5NEwmOHSkW02eIwa2yhHzAdi9AakSiuFIViTZH1a2LwqwWXFGZyG0E0DLq3J69ThIhE0GyhFcDMZjvZAvVV0imy4DeUjqWMila2kV7TmbRD4iYVIm0LEBZIDFST3McIm6V4xoTdkJPxjdDKiPhyiyqn1qaikeUrAhg1aoWqmYyA4flZe2HERG0ZSBWfoWT9lW9Tcb+9ZBfEFq7nMq+OKoYAaGzVKf8piA"
+
+    account = Olm.unpickle_account(pickled_account, "key")
+
+    assert is_reference(account)
+    assert Olm.account_last_error(account) == 'SUCCESS'
   end
 
   test "returns the public parts of the identity keys for an account" do

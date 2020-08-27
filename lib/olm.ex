@@ -22,6 +22,9 @@ defmodule Olm do
   """
   def utility_size(), do: error("utility_size/0")
 
+  @doc """
+  A null terminated string describing the most recent error to happen to a session.
+  """
   def account_last_error(_account_ref), do: error("account_last_error/1")
 
   @doc """
@@ -32,10 +35,12 @@ defmodule Olm do
   @doc """
   Stores an account as a base64 string. Encrypts the account using the supplied key.
   """
-  def pickle_account(_account_ref, _key, _key_length), do: error("pickle_account/3")
+  def pickle_account(_account_ref, _key), do: error("pickle_account/2")
 
-  def unpickle_account(_pickled_account, _pickled_length, _key, _key_length),
-    do: error("unpickle_account/3")
+  @doc """
+  Loads an account from a pickled base64 string. Decrypts the account using the supplied key.
+  """
+  def unpickle_account(_pickled_account, _key), do: error("unpickle_account/2")
 
   @doc """
   Returns the public parts of the identity keys for the account. 
