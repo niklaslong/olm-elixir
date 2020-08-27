@@ -40,4 +40,10 @@ defmodule OlmTest do
     assert is_binary(keys.curve25519)
     assert is_binary(keys.ed25519)
   end
+
+  test "returns the largest number of one time keys this account can store" do
+    assert Olm.create_account()
+           |> Olm.account_max_one_time_keys()
+           |> is_integer()
+  end
 end

@@ -127,6 +127,17 @@ account_idenitiy_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_string(env, identity_keys, ERL_NIF_LATIN1);
 }
 
+static ERL_NIF_TERM
+account_max_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    size_t max = olm_account_max_number_of_one_time_keys(account);
+
+    return enif_make_ulong(env, max);
+}
+
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
@@ -135,6 +146,7 @@ static ErlNifFunc nif_funcs[] = {
     {"create_account", 0, create_account},
     {"pickle_account", 2, pickle_account},
     {"unpickle_account", 2, unpickle_account},
-    {"account_identity_keys", 1, account_idenitiy_keys}};
+    {"account_identity_keys", 1, account_idenitiy_keys},
+    {"account_max_one_time_keys", 1, account_max_one_time_keys}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)
