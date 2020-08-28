@@ -41,6 +41,7 @@ account_last_error(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     OlmAccount* account;
     enif_get_resource(env, argv[0], account_resource, (void**) &account);
 
+    // Perhaps make this atoms?
     const char* last_error = olm_account_last_error(account);
 
     return enif_make_string(env, last_error, ERL_NIF_LATIN1);
@@ -119,12 +120,28 @@ account_idenitiy_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     OlmAccount* account;
     enif_get_resource(env, argv[0], account_resource, (void**) &account);
 
-    size_t keys_length = olm_account_identity_keys_length(account);
+    ErlNifBinary identity_keys;
+    size_t       keys_length = olm_account_identity_keys_length(account);
 
-    char identity_keys[keys_length];
-    olm_account_identity_keys(account, identity_keys, keys_length);
+    enif_alloc_binary(keys_length, &identity_keys);
+    olm_account_identity_keys(account, identity_keys.data, identity_keys.size);
 
-    return enif_make_string(env, identity_keys, ERL_NIF_LATIN1);
+    return enif_make_binary(env, &identity_keys);
+}
+
+static ERL_NIF_TERM
+account_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    ErlNifBinary one_time_keys;
+    size_t one_time_keys_length = olm_account_one_time_keys_length(account);
+
+    enif_alloc_binary(one_time_keys_length, &one_time_keys);
+    olm_account_one_time_keys(account, one_time_keys.data, one_time_keys.size);
+
+    return enif_make_binary(env, &one_time_keys);
 }
 
 static ERL_NIF_TERM
@@ -138,6 +155,31 @@ account_max_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_ulong(env, max);
 }
 
+static ERL_NIF_TERM
+account_generate_one_time_keys(ErlNifEnv*         env,
+                               int                argc,
+                               const ERL_NIF_TERM argv[])
+{
+    // Get args.
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    size_t count;
+    enif_get_ulong(env, argv[1], &count);
+
+    size_t random_length =
+        olm_account_generate_one_time_keys_random_length(account, count);
+
+    // Needs more randomness?
+    char random[random_length];
+    olm_account_generate_one_time_keys(account, count, random, random_length);
+
+    // Needs better error handling.
+    const char* last_error = olm_account_last_error(account);
+
+    return enif_make_string(env, last_error, ERL_NIF_LATIN1);
+}
+
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
@@ -147,6 +189,8 @@ static ErlNifFunc nif_funcs[] = {
     {"pickle_account", 2, pickle_account},
     {"unpickle_account", 2, unpickle_account},
     {"account_identity_keys", 1, account_idenitiy_keys},
-    {"account_max_one_time_keys", 1, account_max_one_time_keys}};
+    {"account_one_time_keys", 1, account_one_time_keys},
+    {"account_max_one_time_keys", 1, account_max_one_time_keys},
+    {"account_generate_one_time_keys", 2, account_generate_one_time_keys}};
 
 ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)

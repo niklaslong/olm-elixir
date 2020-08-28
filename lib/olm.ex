@@ -38,9 +38,20 @@ defmodule Olm do
   def account_identity_keys(_account_ref), do: error("account_identity_keys/1")
 
   @doc """
+  Returns the public parts of the unpublished one time keys for the account.
+  """
+  def account_one_time_keys(_account_ref), do: error("account_one_time_keys/1")
+
+  @doc """
   The largest number of one time keys this account can store.
   """
   def account_max_one_time_keys(_account_ref), do: error("account_max_one_time_keys/1")
+
+  @doc """
+  Generates a number of new one time keys.
+  """
+  def account_generate_one_time_keys(_account_ref, _count),
+    do: error("account_generate_one_time_keys/2")
 
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end
