@@ -38,9 +38,19 @@ defmodule Olm do
   def account_identity_keys(_account_ref), do: error("account_identity_keys/1")
 
   @doc """
+  Signs a message with the ed25519 key for this account.
+  """
+  def account_sign(_account_ref, _message), do: error("account_sign/2")
+
+  @doc """
   Returns the public parts of the unpublished one time keys for the account.
   """
   def account_one_time_keys(_account_ref), do: error("account_one_time_keys/1")
+
+  @doc """
+  Marks the current set of one time keys as being published.
+  """
+  def account_mark_keys_as_published(_account_ref), do: error("account_mark_keys_as_published/1")
 
   @doc """
   The largest number of one time keys this account can store.

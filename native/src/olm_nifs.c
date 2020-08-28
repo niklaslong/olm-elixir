@@ -130,6 +130,10 @@ account_idenitiy_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
+account_sign(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{}
+
+static ERL_NIF_TERM
 account_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     OlmAccount* account;
@@ -143,6 +147,12 @@ account_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     return enif_make_binary(env, &one_time_keys);
 }
+
+static ERL_NIF_TERM
+account_mark_keys_as_published(ErlNifEnv*         env,
+                               int                argc,
+                               const ERL_NIF_TERM argv[])
+{}
 
 static ERL_NIF_TERM
 account_max_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
