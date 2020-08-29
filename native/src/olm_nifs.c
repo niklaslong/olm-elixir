@@ -152,7 +152,15 @@ static ERL_NIF_TERM
 account_mark_keys_as_published(ErlNifEnv*         env,
                                int                argc,
                                const ERL_NIF_TERM argv[])
-{}
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    olm_account_mark_keys_as_published(account);
+
+    return enif_make_string(
+        env, olm_account_last_error(account), ERL_NIF_LATIN1);
+}
 
 static ERL_NIF_TERM
 account_max_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
@@ -200,6 +208,7 @@ static ErlNifFunc nif_funcs[] = {
     {"unpickle_account", 2, unpickle_account},
     {"account_identity_keys", 1, account_idenitiy_keys},
     {"account_one_time_keys", 1, account_one_time_keys},
+    {"account_mark_keys_as_published", 1, account_mark_keys_as_published},
     {"account_max_one_time_keys", 1, account_max_one_time_keys},
     {"account_generate_one_time_keys", 2, account_generate_one_time_keys}};
 

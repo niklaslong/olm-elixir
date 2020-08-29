@@ -59,6 +59,16 @@ defmodule OlmTest do
   end
 
   test "account_mark_keys_as_published/1" do
+    account = Olm.create_account()
+    Olm.account_generate_one_time_keys(account, 1)
+    Olm.account_mark_keys_as_published(account)
+
+    {:ok, keys} =
+      account
+      |> Olm.account_one_time_keys()
+      |> Jason.decode(keys: :atoms)
+
+    assert keys == %{curve25519: %{}}
   end
 
   test "account_max_one_time_keys/1" do
