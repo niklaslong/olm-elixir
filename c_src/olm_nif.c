@@ -52,19 +52,29 @@ create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     size_t account_size = olm_account_size();
 
+    // Allocate memory based on account_size.
     OlmAccount* memory  = enif_alloc_resource(account_resource, account_size);
     OlmAccount* account = olm_account(memory);
 
     size_t random_length = olm_create_account_random_length(account);
+    char   bytes[random_length];
 
-    // TODO: needs more randomness?
-    char bytes[random_length];
-    olm_create_account(account, bytes, random_length);
+    size_t result = olm_create_account(account, bytes, random_length);
 
-    ERL_NIF_TERM term = enif_make_resource(env, account);
-    enif_release_resource(account);
+    // Return {:ok, account_ref} or {:error, last_error}.
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
 
-    return term;
+        return enif_make_tuple2(env, error_atom, error_message);
+    } else {
+        ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM term    = enif_make_resource(env, account);
+        enif_release_resource(account);
+
+        return enif_make_tuple2(env, ok_atom, term);
+    }
 }
 
 static ERL_NIF_TERM
@@ -83,11 +93,22 @@ pickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     size_t pickled_length = olm_pickle_account_length(account);
     enif_alloc_binary(pickled_length, &pickled);
 
-    // Error handling needs to be added.
-    size_t res = olm_pickle_account(
+    size_t result = olm_pickle_account(
         account, key.data, key.size, pickled.data, pickled_length);
 
-    return enif_make_binary(env, &pickled);
+    // Return {:ok, pickled} or {:error, last_error}.
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    } else {
+        ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM term    = enif_make_binary(env, &pickled);
+
+        return enif_make_tuple2(env, ok_atom, term);
+    }
 }
 
 static ERL_NIF_TERM
@@ -105,13 +126,23 @@ unpickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     OlmAccount* memory  = enif_alloc_resource(account_resource, account_size);
     OlmAccount* account = olm_account(memory);
 
-    olm_unpickle_account(
+    size_t result = olm_unpickle_account(
         account, key.data, key.size, pickled.data, pickled.size);
 
-    ERL_NIF_TERM term = enif_make_resource(env, account);
-    enif_release_resource(account);
+    // Return {:ok, account_ref} or {:error, last_error}.
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
 
-    return term;
+        return enif_make_tuple2(env, error_atom, error_message);
+    } else {
+        ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM term    = enif_make_resource(env, account);
+        enif_release_resource(account);
+
+        return enif_make_tuple2(env, ok_atom, term);
+    }
 }
 
 static ERL_NIF_TERM
@@ -120,13 +151,27 @@ account_idenitiy_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     OlmAccount* account;
     enif_get_resource(env, argv[0], account_resource, (void**) &account);
 
+    // Allocate memory for identity keys.
     ErlNifBinary identity_keys;
     size_t       keys_length = olm_account_identity_keys_length(account);
-
     enif_alloc_binary(keys_length, &identity_keys);
-    olm_account_identity_keys(account, identity_keys.data, identity_keys.size);
 
-    return enif_make_binary(env, &identity_keys);
+    size_t result = olm_account_identity_keys(
+        account, identity_keys.data, identity_keys.size);
+
+    // Returns {:ok, identity_keys} or {:error, last_error}.
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    } else {
+        ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM term    = enif_make_binary(env, &identity_keys);
+
+        return enif_make_tuple2(env, ok_atom, term);
+    }
 }
 
 static ERL_NIF_TERM
@@ -142,10 +187,22 @@ account_sign(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     size_t       signature_length = olm_account_signature_length(account);
     enif_alloc_binary(signature_length, &signature);
 
-    olm_account_sign(
+    size_t result = olm_account_sign(
         account, message.data, message.size, signature.data, signature.size);
 
-    return enif_make_binary(env, &signature);
+    // Returns {:ok, signed} or {:error, last_error}.
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    } else {
+        ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM term    = enif_make_binary(env, &signature);
+
+        return enif_make_tuple2(env, ok_atom, term);
+    }
 }
 
 static ERL_NIF_TERM
@@ -156,11 +213,24 @@ account_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     ErlNifBinary one_time_keys;
     size_t one_time_keys_length = olm_account_one_time_keys_length(account);
-
     enif_alloc_binary(one_time_keys_length, &one_time_keys);
-    olm_account_one_time_keys(account, one_time_keys.data, one_time_keys.size);
 
-    return enif_make_binary(env, &one_time_keys);
+    size_t result = olm_account_one_time_keys(
+        account, one_time_keys.data, one_time_keys.size);
+
+    // Returns {:ok, one_time_keys} or {:error, last_error}.
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    } else {
+        ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM term    = enif_make_binary(env, &one_time_keys);
+
+        return enif_make_tuple2(env, ok_atom, term);
+    }
 }
 
 static ERL_NIF_TERM
@@ -171,10 +241,22 @@ account_mark_keys_as_published(ErlNifEnv*         env,
     OlmAccount* account;
     enif_get_resource(env, argv[0], account_resource, (void**) &account);
 
-    olm_account_mark_keys_as_published(account);
+    size_t result = olm_account_mark_keys_as_published(account);
 
-    return enif_make_string(
-        env, olm_account_last_error(account), ERL_NIF_LATIN1);
+    // Returns {:ok, 'SUCCESS'} or {:error, last_error}.
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    } else {
+        ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM term    = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, ok_atom, term);
+    }
 }
 
 static ERL_NIF_TERM
@@ -185,7 +267,10 @@ account_max_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     size_t max = olm_account_max_number_of_one_time_keys(account);
 
-    return enif_make_ulong(env, max);
+    ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM term    = enif_make_ulong(env, max);
+
+    return enif_make_tuple2(env, ok_atom, term);
 }
 
 static ERL_NIF_TERM
@@ -204,13 +289,22 @@ account_generate_one_time_keys(ErlNifEnv*         env,
         olm_account_generate_one_time_keys_random_length(account, count);
 
     // Needs more randomness?
-    char random[random_length];
-    olm_account_generate_one_time_keys(account, count, random, random_length);
+    char   random[random_length];
+    size_t result = olm_account_generate_one_time_keys(
+        account, count, random, random_length);
 
-    // Needs better error handling.
-    const char* last_error = olm_account_last_error(account);
+    ERL_NIF_TERM result_atom;
 
-    return enif_make_string(env, last_error, ERL_NIF_LATIN1);
+    if (result == olm_error()) {
+        result_atom = enif_make_atom(env, "error");
+    } else {
+        result_atom = enif_make_atom(env, "ok");
+    }
+
+    ERL_NIF_TERM error_message =
+        enif_make_string(env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+    return enif_make_tuple2(env, result_atom, error_message);
 }
 
 // Let's define the array of ErlNifFunc beforehand:
