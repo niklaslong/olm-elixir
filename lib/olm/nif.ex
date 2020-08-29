@@ -4,9 +4,6 @@ defmodule Olm.NIF do
   @doc false
   def load_nifs(), do: :erlang.load_nif('priv/olm_nif', 0)
 
-  @doc """
-  The version number of the library.
-  """
   def version(), do: error("version/0")
 
   @doc """
@@ -61,5 +58,4 @@ defmodule Olm.NIF do
     do: error("account_generate_one_time_keys/2")
 
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
-  
 end
