@@ -11,6 +11,8 @@ defmodule OlmTest do
   end
 
   test "account_last_error/1" do
+    assert Olm.create_account()
+           |> Olm.account_last_error() == 'SUCCESS'
   end
 
   test "create_account/0" do
@@ -48,6 +50,12 @@ defmodule OlmTest do
   end
 
   test "account_one_time_keys/1" do
+    {:ok, keys} =
+      Olm.create_account()
+      |> Olm.account_one_time_keys()
+      |> Jason.decode(keys: :atoms)
+
+    assert keys == %{curve25519: %{}}
   end
 
   test "account_mark_keys_as_published/1" do
@@ -60,5 +68,15 @@ defmodule OlmTest do
   end
 
   test "account_generate_one_time_keys/2" do
+    account = Olm.create_account()
+
+    Olm.account_generate_one_time_keys(account, 1)
+
+    {:ok, keys} =
+      account
+      |> Olm.account_one_time_keys()
+      |> Jason.decode(keys: :atoms)
+
+    assert Map.has_key?(keys, :curve25519)
   end
 end
