@@ -118,6 +118,9 @@ unpickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     ErlNifBinary key;
 
     // Read args.
+    // Memory leak when unpickle account is called twice:
+    // First with incorrect key, then with correct key.
+    // Variable in erlang points to wrong data.
     enif_inspect_binary(env, argv[0], &pickled);
     enif_inspect_binary(env, argv[1], &key);
 
