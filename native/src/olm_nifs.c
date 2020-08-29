@@ -131,7 +131,22 @@ account_idenitiy_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
 static ERL_NIF_TERM
 account_sign(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
-{}
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    ErlNifBinary message;
+    enif_inspect_binary(env, argv[1], &message);
+
+    ErlNifBinary signature;
+    size_t       signature_length = olm_account_signature_length(account);
+    enif_alloc_binary(signature_length, &signature);
+
+    olm_account_sign(
+        account, message.data, message.size, signature.data, signature.size);
+
+    return enif_make_binary(env, &signature);
+}
 
 static ERL_NIF_TERM
 account_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
@@ -207,6 +222,7 @@ static ErlNifFunc nif_funcs[] = {
     {"pickle_account", 2, pickle_account},
     {"unpickle_account", 2, unpickle_account},
     {"account_identity_keys", 1, account_idenitiy_keys},
+    {"account_sign", 2, account_sign},
     {"account_one_time_keys", 1, account_one_time_keys},
     {"account_mark_keys_as_published", 1, account_mark_keys_as_published},
     {"account_max_one_time_keys", 1, account_max_one_time_keys},

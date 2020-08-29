@@ -5,6 +5,7 @@ defmodule Olm do
 
   @on_load :load_nifs
 
+  @doc false
   def load_nifs(), do: :erlang.load_nif('priv/native/olm_nifs', 0)
 
   @doc """

@@ -47,6 +47,9 @@ defmodule OlmTest do
   end
 
   test "account_sign/2" do
+    assert Olm.create_account()
+           |> Olm.account_sign("test")
+           |> is_binary()
   end
 
   test "account_one_time_keys/1" do
