@@ -228,4 +228,4 @@ static ErlNifFunc nif_funcs[] = {
     {"account_max_one_time_keys", 1, account_max_one_time_keys},
     {"account_generate_one_time_keys", 2, account_generate_one_time_keys}};
 
-ERL_NIF_INIT(Elixir.Olm, nif_funcs, nif_load, NULL, NULL, NULL)
+ERL_NIF_INIT(Elixir.Olm.NIF, nif_funcs, nif_load, NULL, NULL, NULL)

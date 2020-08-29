@@ -28,7 +28,7 @@ defmodule Olm.MixProject do
   end
 
   defp aliases do
-    [fmt: ["format", "cmd clang-format -i native/src/*.[ch]"]]
+    [fmt: ["format", "cmd clang-format -i c_src/*.[ch]"]]
   end
 end
 
