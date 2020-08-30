@@ -1,5 +1,10 @@
 defmodule Olm.Account do
+  @moduledoc """
+  Functions for working with Olm Accounts.
+  """
+
   alias Olm.NIF
+  alias Jason
 
   @doc """
   Creates a new account.
@@ -19,7 +24,14 @@ defmodule Olm.Account do
   @doc """
   Returns the public parts of the identity keys for the account. 
   """
-  def identity_keys(account_ref), do: NIF.account_identity_keys(account_ref)
+  def identity_keys(account_ref) do
+    with {:ok, keys_as_json} <- NIF.account_identity_keys(account_ref),
+         {:ok, decoded_keys} <- Jason.decode(keys_as_json, keys: :atoms) do
+      {:ok, decoded_keys}
+    else
+      error -> error
+    end
+  end
 
   @doc """
   Signs a message with the ed25519 key for this account.
