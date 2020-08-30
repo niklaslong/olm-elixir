@@ -27,3 +27,5 @@ olm-*.tar
 
 # Ignore VS code project configuration
 .vscode
+
+.iex.exs

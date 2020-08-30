@@ -23,13 +23,12 @@ defmodule Olm.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:jason, "~> 1.2"}
     ]
   end
 
   defp aliases do
-    [fmt: ["format", "cmd clang-format -i native/src/*.[ch]"]]
+    [fmt: ["format", "cmd clang-format -i c_src/*.[ch]"]]
   end
 end
 
