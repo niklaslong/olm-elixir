@@ -316,15 +316,18 @@ account_generate_one_time_keys(ErlNifEnv*         env,
     ERL_NIF_TERM result_atom;
 
     if (result == olm_error()) {
-        result_atom = enif_make_atom(env, "error");
-    } else {
-        result_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
     }
 
-    ERL_NIF_TERM error_message =
-        enif_make_string(env, olm_account_last_error(account), ERL_NIF_LATIN1);
+    result_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM msg =
+        enif_make_string(env, "Successfully generated", ERL_NIF_LATIN1);
 
-    return enif_make_tuple2(env, result_atom, error_message);
+    return enif_make_tuple2(env, result_atom, msg);
 }
 
 // Let's define the array of ErlNifFunc beforehand:

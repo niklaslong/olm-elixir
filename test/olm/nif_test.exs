@@ -88,11 +88,8 @@ defmodule Olm.NIFTest do
 
   test "account_generate_one_time_keys/2" do
     {:ok, account} = NIF.create_account()
-    {:ok, last_error} = NIF.account_generate_one_time_keys(account, 1)
-    {:ok, keys} = NIF.account_one_time_keys(account)
-    {:ok, keys} = Jason.decode(keys, keys: :atoms)
+    {:ok, msg} = NIF.account_generate_one_time_keys(account, 1)
 
-    assert last_error == 'SUCCESS'
-    assert Map.has_key?(keys, :curve25519)
+    assert msg == 'Successfully generated'
   end
 end
