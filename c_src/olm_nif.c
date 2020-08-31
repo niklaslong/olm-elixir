@@ -38,18 +38,6 @@ version(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-account_last_error(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
-{
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
-
-    // Perhaps make this atoms?
-    const char* last_error = olm_account_last_error(account);
-
-    return enif_make_string(env, last_error, ERL_NIF_LATIN1);
-}
-
-static ERL_NIF_TERM
 create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     size_t account_size = olm_account_size();
@@ -334,7 +322,6 @@ account_generate_one_time_keys(ErlNifEnv*         env,
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
     {"version", 0, version},
-    {"account_last_error", 1, account_last_error},
     {"create_account", 0, create_account},
     {"pickle_account", 2, pickle_account},
     {"unpickle_account", 2, unpickle_account},

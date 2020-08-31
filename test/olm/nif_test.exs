@@ -12,11 +12,6 @@ defmodule Olm.NIFTest do
     assert is_integer(patch)
   end
 
-  test "account_last_error/1" do
-    {:ok, account} = NIF.create_account()
-    assert NIF.account_last_error(account) == 'SUCCESS'
-  end
-
   test "create_account/0" do
     assert {:ok, account} = NIF.create_account()
     assert is_reference(account)
@@ -35,9 +30,7 @@ defmodule Olm.NIFTest do
       "pZeOezYWRpPNM5QzdxevG5NEwmOHSkW02eIwa2yhHzAdi9AakSiuFIViTZH1a2LwqwWXFGZyG0E0DLq3J69ThIhE0GyhFcDMZjvZAvVV0imy4DeUjqWMila2kV7TmbRD4iYVIm0LEBZIDFST3McIm6V4xoTdkJPxjdDKiPhyiyqn1qaikeUrAhg1aoWqmYyA4flZe2HERG0ZSBWfoWT9lW9Tcb+9ZBfEFq7nMq+OKoYAaGzVKf8piA"
 
     {:ok, account} = NIF.unpickle_account(pickled_account, "key")
-
     assert is_reference(account)
-    assert NIF.account_last_error(account) == 'SUCCESS'
 
     {:error, last_error} = NIF.unpickle_account(pickled_account, "wrong_key")
 

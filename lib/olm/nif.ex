@@ -5,8 +5,6 @@ defmodule Olm.NIF do
 
   def version(), do: error("version/0")
 
-  def account_last_error(_account_ref), do: error("account_last_error/1")
-
   def create_account(), do: error("create_account/0")
 
   def pickle_account(_account_ref, _key), do: error("pickle_account/2")

@@ -2,11 +2,6 @@ defmodule Olm.Account do
   alias Olm.NIF
 
   @doc """
-  A null terminated string describing the most recent error to happen to a session.
-  """
-  def last_error(account_ref), do: NIF.account_last_error(account_ref)
-
-  @doc """
   Creates a new account.
   """
   def create(), do: NIF.create_account()
