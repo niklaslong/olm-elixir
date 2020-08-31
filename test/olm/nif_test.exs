@@ -55,9 +55,8 @@ defmodule Olm.NIFTest do
   test "account_one_time_keys/1" do
     {:ok, account} = NIF.create_account()
     {:ok, keys} = NIF.account_one_time_keys(account)
-    {:ok, keys} = Jason.decode(keys, keys: :atoms)
 
-    assert keys == %{curve25519: %{}}
+    assert is_binary(keys)
   end
 
   test "account_mark_keys_as_published/1" do

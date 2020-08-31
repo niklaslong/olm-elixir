@@ -41,7 +41,14 @@ defmodule Olm.Account do
   @doc """
   Returns the public parts of the unpublished one time keys for the account.
   """
-  def one_time_keys(account_ref), do: NIF.account_one_time_keys(account_ref)
+  def one_time_keys(account_ref) do
+    with {:ok, keys_as_json} <- NIF.account_one_time_keys(account_ref),
+         {:ok, decoded_keys} <- Jason.decode(keys_as_json, keys: :atoms) do
+      {:ok, decoded_keys}
+    else
+      error -> error
+    end
+  end
 
   @doc """
   Marks the current set of one time keys as being published.
