@@ -3,13 +3,18 @@ defmodule Olm.Account do
   Functions for working with Olm Accounts.
   """
 
-  alias Olm.NIF
+  alias Olm.{NIF, NIFError}
   alias Jason
 
   @doc """
   Creates a new account.
   """
-  def create(), do: NIF.create_account()
+  def create() do
+    case NIF.create_account() do
+      {:ok, account_ref} -> account_ref
+      {:error, error} -> raise NIFError, error
+    end
+  end
 
   @doc """
   Stores an account as a base64 string. Encrypts the account using the supplied key.

@@ -4,10 +4,15 @@ defmodule Olm.AccountTest do
 
   doctest Account
 
+  describe "create/0" do
+    test "returns a reference to an account resource" do
+      assert Account.create() |> is_reference()
+    end
+  end
+
   describe "identity_keys/1:" do
     test "returns a map containing the identity keys for an account" do
-      {:ok, account} = Account.create()
-      {:ok, keys} = Account.identity_keys(account)
+      {:ok, keys} = Account.create() |> Account.identity_keys()
 
       assert Map.has_key?(keys, :curve25519)
       assert Map.has_key?(keys, :ed25519)
@@ -19,14 +24,13 @@ defmodule Olm.AccountTest do
 
   describe "one_time_keys/1:" do
     test "returns a map containing the unpublished one time keys for an account (empty)" do
-      {:ok, account} = Account.create()
-      {:ok, keys} = Account.one_time_keys(account)
+      {:ok, keys} = Account.create() |> Account.one_time_keys()
 
       assert keys == %{curve25519: %{}}
     end
 
     test "returns a map containing the unpublished one time keys for an account (non-empty)" do
-      {:ok, account} = Account.create()
+      account = Account.create()
       {:ok, _} = Account.generate_one_time_keys(account, n = 2)
       {:ok, keys} = Account.one_time_keys(account)
 
