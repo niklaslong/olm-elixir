@@ -4,9 +4,15 @@ defmodule Olm.AccountTest do
 
   doctest Account
 
-  describe "create/0" do
+  describe "create/0:" do
     test "returns a reference to an account resource" do
       assert Account.create() |> is_reference()
+    end
+  end
+
+  describe "pickle/2:" do
+    test "returns the pickled account as a base64 string" do
+      assert Account.create() |> Account.pickle("key") |> is_binary()
     end
   end
 

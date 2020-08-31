@@ -19,7 +19,12 @@ defmodule Olm.Account do
   @doc """
   Stores an account as a base64 string. Encrypts the account using the supplied key.
   """
-  def pickle(account_ref, key), do: NIF.pickle_account(account_ref, key)
+  def pickle(account_ref, key) when is_reference(account_ref) and is_binary(key) do
+    case NIF.pickle_account(account_ref, key) do
+      {:ok, pickled_account} -> pickled_account
+      {:error, error} -> raise NIFError, error
+    end
+  end
 
   @doc """
   Loads an account from a pickled base64 string. Decrypts the account using the supplied key.
