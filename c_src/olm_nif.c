@@ -273,10 +273,10 @@ account_mark_keys_as_published(ErlNifEnv*         env,
     }
 
     ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
-    ERL_NIF_TERM term =
-        enif_make_string(env, olm_account_last_error(account), ERL_NIF_LATIN1);
+    ERL_NIF_TERM msg     = enif_make_string(
+        env, "Successfully marked keys as published", ERL_NIF_LATIN1);
 
-    return enif_make_tuple2(env, ok_atom, term);
+    return enif_make_tuple2(env, ok_atom, msg);
 }
 
 static ERL_NIF_TERM

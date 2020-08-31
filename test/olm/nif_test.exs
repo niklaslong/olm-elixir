@@ -69,14 +69,10 @@ defmodule Olm.NIFTest do
 
   test "account_mark_keys_as_published/1" do
     {:ok, account} = NIF.create_account()
-    NIF.account_generate_one_time_keys(account, 1)
+    {:ok, _} = NIF.account_generate_one_time_keys(account, 1)
+    {:ok, msg} = NIF.account_mark_keys_as_published(account)
 
-    {:ok, last_error} = NIF.account_mark_keys_as_published(account)
-    {:ok, keys} = NIF.account_one_time_keys(account)
-    {:ok, keys} = Jason.decode(keys, keys: :atoms)
-
-    assert last_error == 'SUCCESS'
-    assert keys == %{curve25519: %{}}
+    assert msg == 'Successfully marked keys as published'
   end
 
   test "account_max_one_time_keys/1" do
