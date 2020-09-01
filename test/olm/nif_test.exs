@@ -12,11 +12,6 @@ defmodule Olm.NIFTest do
     assert is_integer(patch)
   end
 
-  test "account_last_error/1" do
-    {:ok, account} = NIF.create_account()
-    assert NIF.account_last_error(account) == 'SUCCESS'
-  end
-
   test "create_account/0" do
     assert {:ok, account} = NIF.create_account()
     assert is_reference(account)
@@ -35,9 +30,7 @@ defmodule Olm.NIFTest do
       "pZeOezYWRpPNM5QzdxevG5NEwmOHSkW02eIwa2yhHzAdi9AakSiuFIViTZH1a2LwqwWXFGZyG0E0DLq3J69ThIhE0GyhFcDMZjvZAvVV0imy4DeUjqWMila2kV7TmbRD4iYVIm0LEBZIDFST3McIm6V4xoTdkJPxjdDKiPhyiyqn1qaikeUrAhg1aoWqmYyA4flZe2HERG0ZSBWfoWT9lW9Tcb+9ZBfEFq7nMq+OKoYAaGzVKf8piA"
 
     {:ok, account} = NIF.unpickle_account(pickled_account, "key")
-
     assert is_reference(account)
-    assert NIF.account_last_error(account) == 'SUCCESS'
 
     {:error, last_error} = NIF.unpickle_account(pickled_account, "wrong_key")
 
@@ -69,14 +62,10 @@ defmodule Olm.NIFTest do
 
   test "account_mark_keys_as_published/1" do
     {:ok, account} = NIF.create_account()
-    NIF.account_generate_one_time_keys(account, 1)
+    {:ok, _} = NIF.account_generate_one_time_keys(account, 1)
+    {:ok, msg} = NIF.account_mark_keys_as_published(account)
 
-    {:ok, last_error} = NIF.account_mark_keys_as_published(account)
-    {:ok, keys} = NIF.account_one_time_keys(account)
-    {:ok, keys} = Jason.decode(keys, keys: :atoms)
-
-    assert last_error == 'SUCCESS'
-    assert keys == %{curve25519: %{}}
+    assert msg == 'Successfully marked keys as published'
   end
 
   test "account_max_one_time_keys/1" do
@@ -88,11 +77,8 @@ defmodule Olm.NIFTest do
 
   test "account_generate_one_time_keys/2" do
     {:ok, account} = NIF.create_account()
-    {:ok, last_error} = NIF.account_generate_one_time_keys(account, 1)
-    {:ok, keys} = NIF.account_one_time_keys(account)
-    {:ok, keys} = Jason.decode(keys, keys: :atoms)
+    {:ok, msg} = NIF.account_generate_one_time_keys(account, 1)
 
-    assert last_error == 'SUCCESS'
-    assert Map.has_key?(keys, :curve25519)
+    assert msg == 'Successfully generated'
   end
 end

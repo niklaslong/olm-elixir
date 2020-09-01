@@ -38,18 +38,6 @@ version(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-account_last_error(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
-{
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
-
-    // Perhaps make this atoms?
-    const char* last_error = olm_account_last_error(account);
-
-    return enif_make_string(env, last_error, ERL_NIF_LATIN1);
-}
-
-static ERL_NIF_TERM
 create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     size_t account_size = olm_account_size();
@@ -273,10 +261,10 @@ account_mark_keys_as_published(ErlNifEnv*         env,
     }
 
     ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
-    ERL_NIF_TERM term =
-        enif_make_string(env, olm_account_last_error(account), ERL_NIF_LATIN1);
+    ERL_NIF_TERM msg     = enif_make_string(
+        env, "Successfully marked keys as published", ERL_NIF_LATIN1);
 
-    return enif_make_tuple2(env, ok_atom, term);
+    return enif_make_tuple2(env, ok_atom, msg);
 }
 
 static ERL_NIF_TERM
@@ -316,22 +304,24 @@ account_generate_one_time_keys(ErlNifEnv*         env,
     ERL_NIF_TERM result_atom;
 
     if (result == olm_error()) {
-        result_atom = enif_make_atom(env, "error");
-    } else {
-        result_atom = enif_make_atom(env, "ok");
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
     }
 
-    ERL_NIF_TERM error_message =
-        enif_make_string(env, olm_account_last_error(account), ERL_NIF_LATIN1);
+    result_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM msg =
+        enif_make_string(env, "Successfully generated", ERL_NIF_LATIN1);
 
-    return enif_make_tuple2(env, result_atom, error_message);
+    return enif_make_tuple2(env, result_atom, msg);
 }
 
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
     {"version", 0, version},
-    {"account_last_error", 1, account_last_error},
     {"create_account", 0, create_account},
     {"pickle_account", 2, pickle_account},
     {"unpickle_account", 2, unpickle_account},
