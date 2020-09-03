@@ -4,6 +4,9 @@ defmodule Olm.AccountTest do
 
   doctest Account
 
+  defp create_account(_context), do: %{account: Account.create()}
+  defp pickle_account(context), do: %{pickled_account: Account.pickle(context.account, "key")}
+
   describe "create/0:" do
     test "returns a reference to an account resource" do
       assert Account.create() |> is_reference()
@@ -13,6 +16,20 @@ defmodule Olm.AccountTest do
   describe "pickle/2:" do
     test "returns the pickled account as a base64 string" do
       assert Account.create() |> Account.pickle("key") |> is_binary()
+    end
+  end
+
+  describe "unpickle/2:" do
+    setup [:create_account, :pickle_account]
+
+    test "returns a reference to the unpickled account", context do
+      assert {:ok, account} = Account.unpickle(context.pickled_account, "key")
+      assert is_reference(account)
+    end
+
+    test "returns an error when wrong key is given to decrypt the account", context do
+      assert {:error, msg} = Account.unpickle(context[:pickled_account], "wrong_key")
+      assert msg == "bad account key: can't decrypt the pickled account"
     end
   end
 

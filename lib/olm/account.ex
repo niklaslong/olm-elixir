@@ -29,7 +29,18 @@ defmodule Olm.Account do
   @doc """
   Loads an account from a pickled base64 string. Decrypts the account using the supplied key.
   """
-  def unpickle(pickled_account, key), do: NIF.unpickle_account(pickled_account, key)
+  def unpickle(pickled_account, key) when is_binary(pickled_account) and is_binary(key) do
+    case NIF.unpickle_account(pickled_account, key) do
+      {:ok, account_ref} ->
+        {:ok, account_ref}
+
+      {:error, 'BAD_ACCOUNT_KEY'} ->
+        {:error, "bad account key: can't decrypt the pickled account"}
+
+      {:error, error} ->
+        raise NIFError, error
+    end
+  end
 
   @doc """
   Returns the public parts of the identity keys for the account. 
