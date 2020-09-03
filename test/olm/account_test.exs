@@ -9,13 +9,15 @@ defmodule Olm.AccountTest do
 
   describe "create/0:" do
     test "returns a reference to an account resource" do
-      assert Account.create() |> is_reference()
+      assert is_reference(Account.create())
     end
   end
 
   describe "pickle/2:" do
-    test "returns the pickled account as a base64 string" do
-      assert Account.create() |> Account.pickle("key") |> is_binary()
+    setup [:create_account]
+
+    test "returns the pickled account as a base64 string", context do
+      assert context.account |> Account.pickle("key") |> is_binary()
     end
   end
 
@@ -34,8 +36,10 @@ defmodule Olm.AccountTest do
   end
 
   describe "identity_keys/1:" do
-    test "returns a map containing the identity keys for an account" do
-      {:ok, keys} = Account.create() |> Account.identity_keys()
+    setup [:create_account]
+
+    test "returns a map containing the identity keys for an account", context do
+      {:ok, keys} = Account.identity_keys(context.account)
 
       assert Map.has_key?(keys, :curve25519)
       assert Map.has_key?(keys, :ed25519)
@@ -46,16 +50,16 @@ defmodule Olm.AccountTest do
   end
 
   describe "one_time_keys/1:" do
-    test "returns a map containing the unpublished one time keys for an account (empty)" do
-      {:ok, keys} = Account.create() |> Account.one_time_keys()
+    setup [:create_account]
 
+    test "returns a map of unpublished one time keys for an account (empty)", context do
+      assert {:ok, keys} = Account.one_time_keys(context.account)
       assert keys == %{curve25519: %{}}
     end
 
-    test "returns a map containing the unpublished one time keys for an account (non-empty)" do
-      account = Account.create()
-      {:ok, _} = Account.generate_one_time_keys(account, n = 2)
-      {:ok, keys} = Account.one_time_keys(account)
+    test "returns a map of unpublished one time keys for an account (non-empty)", context do
+      {:ok, _} = Account.generate_one_time_keys(context.account, n = 2)
+      {:ok, keys} = Account.one_time_keys(context.account)
 
       assert Map.has_key?(keys, :curve25519)
       assert keys.curve25519 |> Map.keys() |> length() == n
