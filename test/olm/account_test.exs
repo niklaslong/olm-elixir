@@ -65,7 +65,7 @@ defmodule Olm.AccountTest do
     end
 
     test "returns a map of unpublished one time keys for an account (non-empty)", context do
-      {:ok, _} = Account.generate_one_time_keys(context.account, n = 2)
+      :ok = Account.generate_one_time_keys(context.account, n = 2)
       keys = Account.one_time_keys(context.account)
 
       assert Map.has_key?(keys, :curve25519)
@@ -87,6 +87,18 @@ defmodule Olm.AccountTest do
 
     test "returns max number of one time keys for an account", context do
       assert context.account |> Account.max_one_time_keys() |> is_integer()
+    end
+  end
+
+  describe "generate_one_time_keys/2" do
+    setup :create_account
+
+    test "returns :ok after generating accounts", context do
+      assert Account.generate_one_time_keys(context.account, 1) == :ok
+    end
+
+    test "returns one time keys if return is set to true", context do
+      assert context.account |> Account.generate_one_time_keys(3, true) |> is_map
     end
   end
 end
