@@ -55,7 +55,12 @@ defmodule Olm.Account do
   @doc """
   Signs a message with the ed25519 key for this account.
   """
-  def sign(account_ref, message), do: NIF.account_sign(account_ref, message)
+  def sign(account_ref, message) when is_reference(account_ref) and is_binary(message) do
+    case NIF.account_sign(account_ref, message) do
+      {:ok, signed} -> signed
+      {:error, error} -> raise NIFError, error
+    end
+  end
 
   @doc """
   Returns the public parts of the unpublished one time keys for the account.

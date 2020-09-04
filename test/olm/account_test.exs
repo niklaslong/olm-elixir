@@ -49,6 +49,14 @@ defmodule Olm.AccountTest do
     end
   end
 
+  describe "sign/2:" do
+    setup :create_account
+
+    test "returns the message signed with the ed25519 key", context do
+      assert context.account |> Account.sign("message") |> is_binary
+    end
+  end
+
   describe "one_time_keys/1:" do
     setup :create_account
 
