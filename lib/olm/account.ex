@@ -85,7 +85,12 @@ defmodule Olm.Account do
   @doc """
   The largest number of one time keys this account can store.
   """
-  def max_one_time_keys(account_ref), do: NIF.account_max_one_time_keys(account_ref)
+  def max_one_time_keys(account_ref) do
+    case NIF.account_max_one_time_keys(account_ref) do
+      {:ok, max} -> max
+      {:error, error} -> raise NIFError, error
+    end
+  end
 
   @doc """
   Generates a number of new one time keys.

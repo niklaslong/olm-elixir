@@ -81,4 +81,12 @@ defmodule Olm.AccountTest do
       assert Account.mark_keys_as_published(context.account) == :ok
     end
   end
+
+  describe "max_one_time_keys/1:" do
+    setup :create_account
+
+    test "returns max number of one time keys for an account", context do
+      assert context.account |> Account.max_one_time_keys() |> is_integer()
+    end
+  end
 end
