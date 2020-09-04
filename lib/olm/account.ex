@@ -77,7 +77,12 @@ defmodule Olm.Account do
   @doc """
   Marks the current set of one time keys as being published.
   """
-  def mark_keys_as_published(account_ref), do: NIF.account_mark_keys_as_published(account_ref)
+  def mark_keys_as_published(account_ref) when is_reference(account_ref) do
+    case NIF.account_mark_keys_as_published(account_ref) do
+      {:ok, _} -> :ok
+      {:error, error} -> raise NIFError, error
+    end
+  end
 
   @doc """
   The largest number of one time keys this account can store.

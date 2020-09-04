@@ -74,4 +74,12 @@ defmodule Olm.AccountTest do
       assert keys.curve25519 |> Map.values() |> Enum.each(&is_binary/1)
     end
   end
+
+  describe "mark_keys_as_published/1:" do
+    setup :create_account
+
+    test "returns :ok after marking keys as published", context do
+      assert :ok == Account.mark_keys_as_published(context.account)
+    end
+  end
 end
