@@ -45,12 +45,10 @@ defmodule Olm.Account do
   @doc """
   Returns the public parts of the identity keys for the account. 
   """
-  def identity_keys(account_ref) do
-    with {:ok, keys_as_json} <- NIF.account_identity_keys(account_ref),
-         {:ok, decoded_keys} <- Jason.decode(keys_as_json, keys: :atoms) do
-      {:ok, decoded_keys}
-    else
-      error -> error
+  def identity_keys(account_ref) when is_reference(account_ref) do
+    case NIF.account_identity_keys(account_ref) do
+      {:ok, keys_as_json} -> Jason.decode!(keys_as_json, keys: :atoms)
+      {:error, error} -> raise NIFError, error
     end
   end
 

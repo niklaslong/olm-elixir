@@ -14,7 +14,7 @@ defmodule Olm.AccountTest do
   end
 
   describe "pickle/2:" do
-    setup [:create_account]
+    setup :create_account
 
     test "returns the pickled account as a base64 string", context do
       assert context.account |> Account.pickle("key") |> is_binary()
@@ -36,10 +36,10 @@ defmodule Olm.AccountTest do
   end
 
   describe "identity_keys/1:" do
-    setup [:create_account]
+    setup :create_account
 
     test "returns a map containing the identity keys for an account", context do
-      {:ok, keys} = Account.identity_keys(context.account)
+      keys = Account.identity_keys(context.account)
 
       assert Map.has_key?(keys, :curve25519)
       assert Map.has_key?(keys, :ed25519)
@@ -50,7 +50,7 @@ defmodule Olm.AccountTest do
   end
 
   describe "one_time_keys/1:" do
-    setup [:create_account]
+    setup :create_account
 
     test "returns a map of unpublished one time keys for an account (empty)", context do
       assert {:ok, keys} = Account.one_time_keys(context.account)
