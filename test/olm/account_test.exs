@@ -61,13 +61,12 @@ defmodule Olm.AccountTest do
     setup :create_account
 
     test "returns a map of unpublished one time keys for an account (empty)", context do
-      assert {:ok, keys} = Account.one_time_keys(context.account)
-      assert keys == %{curve25519: %{}}
+      assert Account.one_time_keys(context.account) == %{curve25519: %{}}
     end
 
     test "returns a map of unpublished one time keys for an account (non-empty)", context do
       {:ok, _} = Account.generate_one_time_keys(context.account, n = 2)
-      {:ok, keys} = Account.one_time_keys(context.account)
+      keys = Account.one_time_keys(context.account)
 
       assert Map.has_key?(keys, :curve25519)
       assert keys.curve25519 |> Map.keys() |> length() == n
@@ -79,7 +78,7 @@ defmodule Olm.AccountTest do
     setup :create_account
 
     test "returns :ok after marking keys as published", context do
-      assert :ok == Account.mark_keys_as_published(context.account)
+      assert Account.mark_keys_as_published(context.account) == :ok
     end
   end
 end
