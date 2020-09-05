@@ -355,6 +355,53 @@ utility_sha256(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_tuple2(env, ok_atom, term);
 }
 
+static ERL_NIF_TERM
+utility_ed25519_verify(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    ErlNifBinary key;
+    ErlNifBinary message;
+    ErlNifBinary signature, signature_input;
+
+    enif_inspect_binary(env, argv[0], &key);
+    enif_inspect_binary(env, argv[1], &message);
+
+    enif_inspect_binary(env, argv[2], &signature_input);
+    enif_alloc_binary(signature_input.size, &signature);
+    memcpy(signature.data, signature_input.data, signature_input.size);
+
+    size_t      utility_size = olm_utility_size();
+    OlmUtility* memory       = enif_alloc(utility_size);
+    OlmUtility* utility      = olm_utility(memory);
+
+    size_t result = olm_ed25519_verify(utility,
+                                       key.data,
+                                       key.size,
+                                       message.data,
+                                       message.size,
+                                       signature.data,
+                                       signature.size);
+
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_utility_last_error(utility), ERL_NIF_LATIN1);
+
+        enif_free(memory);
+        enif_release_binary(&signature);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    }
+
+    ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM msg =
+        enif_make_string(env, "Signature verified", ERL_NIF_LATIN1);
+
+    enif_free(memory);
+    enif_release_binary(&signature);
+
+    return enif_make_tuple2(env, ok_atom, msg);
+}
+
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
@@ -368,6 +415,7 @@ static ErlNifFunc nif_funcs[] = {
     {"account_mark_keys_as_published", 1, account_mark_keys_as_published},
     {"account_max_one_time_keys", 1, account_max_one_time_keys},
     {"account_generate_one_time_keys", 2, account_generate_one_time_keys},
-    {"utility_sha256", 1, utility_sha256}};
+    {"utility_sha256", 1, utility_sha256},
+    {"utility_ed25519_verify", 3, utility_ed25519_verify}};
 
 ERL_NIF_INIT(Elixir.Olm.NIF, nif_funcs, nif_load, NULL, NULL, NULL)
