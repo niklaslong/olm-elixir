@@ -13,7 +13,7 @@ defmodule Olm.NIFTest do
   end
 
   test "create_account/0" do
-    assert {:ok, account} = NIF.create_account()
+    {:ok, account} = NIF.create_account()
     assert is_reference(account)
   end
 
@@ -22,7 +22,6 @@ defmodule Olm.NIFTest do
     {:ok, pickled_account} = NIF.pickle_account(account, "key")
 
     assert is_binary(pickled_account)
-    assert String.length(pickled_account) == 246
   end
 
   test "unpickle_account/2" do
@@ -33,8 +32,6 @@ defmodule Olm.NIFTest do
     assert is_reference(account)
 
     {:error, last_error} = NIF.unpickle_account(pickled_account, "wrong_key")
-
-    assert is_list(last_error)
     assert last_error == 'BAD_ACCOUNT_KEY'
   end
 
@@ -55,9 +52,8 @@ defmodule Olm.NIFTest do
   test "account_one_time_keys/1" do
     {:ok, account} = NIF.create_account()
     {:ok, keys} = NIF.account_one_time_keys(account)
-    {:ok, keys} = Jason.decode(keys, keys: :atoms)
 
-    assert keys == %{curve25519: %{}}
+    assert is_binary(keys)
   end
 
   test "account_mark_keys_as_published/1" do

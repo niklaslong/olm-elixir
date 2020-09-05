@@ -1,3 +1,13 @@
+defmodule Olm.NIFError do
+  defexception [:message]
+
+  @impl true
+  def exception(value) do
+    msg = "something is breaking in the C NIF, got: #{inspect(value)}"
+    %Olm.NIFError{message: msg}
+  end
+end
+
 defmodule Olm.NIF do
   @on_load :load_nifs
 
