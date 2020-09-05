@@ -34,5 +34,7 @@ defmodule Olm.NIF do
   def account_generate_one_time_keys(_account_ref, _count),
     do: error("account_generate_one_time_keys/2")
 
+  def utility_sha256(_string), do: error("utility_sha256/1")
+
   defp error(function_name), do: :erlang.nif_error("NIF #{function_name} not implemented")
 end

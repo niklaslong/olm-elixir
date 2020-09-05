@@ -318,6 +318,43 @@ account_generate_one_time_keys(ErlNifEnv*         env,
     return enif_make_tuple2(env, result_atom, msg);
 }
 
+static ERL_NIF_TERM
+utility_sha256(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    // Args
+    ErlNifBinary input;
+    enif_inspect_binary(env, argv[0], &input);
+
+    size_t      utility_size = olm_utility_size();
+    OlmUtility* memory       = enif_alloc(utility_size);
+    OlmUtility* utility      = olm_utility(memory);
+
+    ErlNifBinary output;
+    size_t       output_length = olm_sha256_length(utility);
+    enif_alloc_binary(output_length, &output);
+
+    size_t result =
+        olm_sha256(utility, input.data, input.size, output.data, output.size);
+
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_utility_last_error(utility), ERL_NIF_LATIN1);
+
+        enif_release_binary(&output);
+        enif_free(memory);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    }
+
+    ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM term    = enif_make_binary(env, &output);
+
+    enif_free(memory);
+
+    return enif_make_tuple2(env, ok_atom, term);
+}
+
 // Let's define the array of ErlNifFunc beforehand:
 static ErlNifFunc nif_funcs[] = {
     // {erl_function_name, erl_function_arity, c_function}
@@ -330,6 +367,7 @@ static ErlNifFunc nif_funcs[] = {
     {"account_one_time_keys", 1, account_one_time_keys},
     {"account_mark_keys_as_published", 1, account_mark_keys_as_published},
     {"account_max_one_time_keys", 1, account_max_one_time_keys},
-    {"account_generate_one_time_keys", 2, account_generate_one_time_keys}};
+    {"account_generate_one_time_keys", 2, account_generate_one_time_keys},
+    {"utility_sha256", 1, utility_sha256}};
 
 ERL_NIF_INIT(Elixir.Olm.NIF, nif_funcs, nif_load, NULL, NULL, NULL)

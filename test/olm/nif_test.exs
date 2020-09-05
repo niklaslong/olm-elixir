@@ -77,4 +77,9 @@ defmodule Olm.NIFTest do
 
     assert msg == 'Successfully generated'
   end
+
+  test "utility_sha256/1" do
+    {:ok, hash} = NIF.utility_sha256("string")
+    assert is_binary(hash)
+  end
 end
