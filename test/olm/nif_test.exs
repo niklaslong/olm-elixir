@@ -77,4 +77,20 @@ defmodule Olm.NIFTest do
 
     assert msg == 'Successfully generated'
   end
+
+  test "utility_sha256/1" do
+    {:ok, hash} = NIF.utility_sha256("string")
+    assert is_binary(hash)
+  end
+
+  test "utility__ed25519_verify/3" do
+    message = "test"
+    key = "z1Hu9hAT4x13Os/W9u1r/YsTnUKpHIhlkMJWJo/VvE8"
+
+    signature =
+      "0hdJ8fLBjxTDBYpknqa3KsgucquFIrouEuNHxagrUJseQUfXmASiWX1gpHmVDH+Eg+jBkYQM5fAGqvhCYseVBA"
+
+    {:ok, msg} = NIF.utility_ed25519_verify(key, message, signature)
+    assert msg == 'Signature verified'
+  end
 end
