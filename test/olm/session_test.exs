@@ -22,6 +22,12 @@ defmodule Olm.SessionTest do
     %{peer_id_key: id_key, peer_one_time_key: one_time_key}
   end
 
+  defp create_outbound_session(context),
+    do: %{
+      outbound_session:
+        Session.new_outbound(context.account, context.peer_id_key, context.peer_one_time_key)
+    }
+
   describe "new_outbound/3:" do
     setup [:create_account, :generate_peer_keys]
 
@@ -33,6 +39,14 @@ defmodule Olm.SessionTest do
                  context.peer_one_time_key
                )
              )
+    end
+  end
+
+  describe "encrypt_message/2:" do
+    setup [:create_account, :generate_peer_keys, :create_outbound_session]
+
+    test "returns base64 encoded cyphertext", context do
+      assert is_binary(Session.encrypt_message(context.outbound_session, "message"))
     end
   end
 end

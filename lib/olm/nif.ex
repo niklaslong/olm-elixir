@@ -37,6 +37,12 @@ defmodule Olm.NIF do
   def create_outbound_session(_account_ref, _peer_id_key, _peer_one_time_key),
     do: error("create_outbound_session/3")
 
+  def encrypt_message(_session_ref, _plaintext), do: error("encrypt_message/2")
+
+  # def create_inbound_session(_account_ref, _message), do: error("create_inbound_session/2")
+
+  # def create_inbound_session_from(_account_ref, _message, _peer_id_key), do: error("create_inbound_session_from/3")
+
   def utility_sha256(_string), do: error("utility_sha256/1")
 
   def utility_ed25519_verify(_key, _message, _signature), do: error("utility_ed25519_verify/3")

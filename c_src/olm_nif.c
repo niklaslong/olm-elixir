@@ -381,6 +381,44 @@ create_outbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_tuple2(env, ok_atom, term);
 }
 
+static ERL_NIF_TERM
+encrypt_message(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmSession* session;
+    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+
+    ErlNifBinary plaintext;
+    enif_inspect_binary(env, argv[1], &plaintext);
+
+    size_t random_length = olm_encrypt_random_length(session);
+    char   bytes[random_length];
+
+    ErlNifBinary message;
+    size_t message_length = olm_encrypt_message_length(session, plaintext.size);
+    enif_alloc_binary(message_length, &message);
+
+    size_t result = olm_encrypt(session,
+                                plaintext.data,
+                                plaintext.size,
+                                bytes,
+                                random_length,
+                                message.data,
+                                message.size);
+
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_session_last_error(session), ERL_NIF_LATIN1);
+
+        enif_release_binary(&message);
+    }
+
+    ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM term    = enif_make_binary(env, &message);
+
+    return enif_make_tuple2(env, ok_atom, term);
+}
+
 // Utility
 
 static ERL_NIF_TERM
@@ -481,6 +519,7 @@ static ErlNifFunc nif_funcs[] = {
     {"account_max_one_time_keys", 1, account_max_one_time_keys},
     {"account_generate_one_time_keys", 2, account_generate_one_time_keys},
     {"create_outbound_session", 3, create_outbound_session},
+    {"encrypt_message", 2, encrypt_message},
     {"utility_sha256", 1, utility_sha256},
     {"utility_ed25519_verify", 3, utility_ed25519_verify}};
 

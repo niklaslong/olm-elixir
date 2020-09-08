@@ -12,4 +12,11 @@ defmodule Olm.Session do
       {:error, error} -> raise NIFError, error
     end
   end
+
+  def encrypt_message(session_ref, plaintext) do
+    case NIF.encrypt_message(session_ref, plaintext) do
+      {:ok, cyphertext} -> cyphertext
+      {:error, error} -> raise NIFError, error
+    end
+  end
 end
