@@ -382,6 +382,48 @@ create_outbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
+create_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    ErlNifBinary cyphertext;
+    enif_inspect_binary(env, argv[1], &cyphertext);
+
+    ErlNifBinary peer_id_key;
+    enif_inspect_binary(env, argv[2], &peer_id_key);
+
+    // Allocate new session
+    size_t      session_size = olm_session_size();
+    OlmSession* memory  = enif_alloc_resource(session_resource, session_size);
+    OlmSession* session = olm_session(memory);
+
+    size_t result = olm_create_inbound_session_from(session,
+                                                    account,
+                                                    peer_id_key.data,
+                                                    peer_id_key.size,
+                                                    cyphertext.data,
+                                                    cyphertext.size);
+
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_session_last_error(session), ERL_NIF_LATIN1);
+
+        enif_release_resource(session);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    }
+
+    ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM term    = enif_make_resource(env, session);
+
+    enif_release_resource(session);
+
+    return enif_make_tuple2(env, ok_atom, term);
+}
+
+static ERL_NIF_TERM
 encrypt_message_type(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     OlmSession* session;
@@ -541,6 +583,7 @@ static ErlNifFunc nif_funcs[] = {
     {"account_max_one_time_keys", 1, account_max_one_time_keys},
     {"account_generate_one_time_keys", 2, account_generate_one_time_keys},
     {"create_outbound_session", 3, create_outbound_session},
+    {"create_inbound_session_from", 3, create_inbound_session_from},
     {"encrypt_message_type", 1, encrypt_message_type},
     {"encrypt_message", 2, encrypt_message},
     {"utility_sha256", 1, utility_sha256},

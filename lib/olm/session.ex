@@ -17,6 +17,17 @@ defmodule Olm.Session do
   end
 
   @doc """
+  Create a new in-bound session for sending/receiving messages from an incoming PRE_KEY message.
+  """
+  def new_inbound(account_ref, message, peer_id_key)
+      when is_reference(account_ref) and is_binary(message) and is_binary(peer_id_key) do
+    case NIF.create_inbound_session_from(account_ref, message, peer_id_key) do
+      {:ok, session_ref} -> session_ref
+      {:error, error} -> raise NIFError, error
+    end
+  end
+
+  @doc """
   Encrypts a message using the session.
   """
   def encrypt_message(session_ref, plaintext)
