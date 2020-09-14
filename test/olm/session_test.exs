@@ -81,6 +81,25 @@ defmodule Olm.SessionTest do
     end
   end
 
+  describe "match_inbound/3" do
+    setup [
+      :create_account,
+      :create_peer_account,
+      :create_outbound_session,
+      :encrypt_message,
+      :create_inbound_session
+    ]
+
+    @fixtures %{msg_content: "This is a message"}
+    test "returns 1 if current inbound session matches pre key message", context do
+      assert Session.match_inbound(
+               context.inbound_session,
+               context.pre_key_msg.cyphertext,
+               context.id_key
+             ) === 1
+    end
+  end
+
   describe "encrypt_message/2:" do
     setup [:create_account, :create_peer_account, :create_outbound_session]
 

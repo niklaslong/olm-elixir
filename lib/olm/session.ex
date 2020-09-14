@@ -32,6 +32,14 @@ defmodule Olm.Session do
     end
   end
 
+  def match_inbound(session_ref, message, peer_id_key \\ "")
+      when is_reference(session_ref) and is_binary(message) and is_binary(peer_id_key) do
+    case NIF.match_inbound_session_from(session_ref, message, peer_id_key) do
+      {:ok, val} -> val
+      {:error, error} -> raise NIFError, error
+    end
+  end
+
   @doc """
   Encrypts a message using the session.
   """

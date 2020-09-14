@@ -101,4 +101,10 @@ defmodule Olm.AccountTest do
       assert context.account |> Account.generate_one_time_keys(3, true) |> is_map
     end
   end
+
+  describe "remove_one_time_keys/2:" do
+    @tag :skip
+    test "returns :ok after removing used one time keys" do
+    end
+  end
 end

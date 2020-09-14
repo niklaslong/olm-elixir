@@ -34,6 +34,8 @@ defmodule Olm.NIF do
   def account_generate_one_time_keys(_account_ref, _count),
     do: error("account_generate_one_time_keys/2")
 
+  # def remove_one_time_keys(_account_ref, _session_ref), do: error("remove_one_time_keys/2")
+
   def create_outbound_session(_account_ref, _peer_id_key, _peer_one_time_key),
     do: error("create_outbound_session/3")
 
@@ -41,6 +43,17 @@ defmodule Olm.NIF do
 
   def create_inbound_session_from(_account_ref, _message, _peer_id_key),
     do: error("create_inbound_session_from/3")
+
+  # def session_id(_session_ref), do: error("session_id/1")
+
+  # def match_inbound_session(_account_ref, _message), do error("match_inbound_session_from/2")
+
+  def match_inbound_session_from(_session_ref, _message, _peer_id_key),
+    do: error("match_inbound_session_from/3")
+
+  # def pickle_session(_session_ref, _key), do: error("pickle_session/2")
+
+  # def unpickle_session(_pickled_session, _key), do: error("unpickle_session/2") 
 
   def encrypt_message_type(_session_ref), do: error("encrypt_message_type/1")
 
