@@ -387,8 +387,10 @@ create_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     OlmAccount* account;
     enif_get_resource(env, argv[0], account_resource, (void**) &account);
 
-    ErlNifBinary cyphertext;
-    enif_inspect_binary(env, argv[1], &cyphertext);
+    ErlNifBinary cyphertext, cyphertext_input;
+    enif_inspect_binary(env, argv[1], &cyphertext_input);
+    enif_alloc_binary(cyphertext_input.size, &cyphertext);
+    memcpy(cyphertext.data, cyphertext_input.data, cyphertext_input.size);
 
     ErlNifBinary peer_id_key;
     enif_inspect_binary(env, argv[2], &peer_id_key);
@@ -411,6 +413,7 @@ create_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
             env, olm_session_last_error(session), ERL_NIF_LATIN1);
 
         enif_release_resource(session);
+        enif_release_binary(&cyphertext);
 
         return enif_make_tuple2(env, error_atom, error_message);
     }
@@ -419,6 +422,7 @@ create_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     ERL_NIF_TERM term    = enif_make_resource(env, session);
 
     enif_release_resource(session);
+    enif_release_binary(&cyphertext);
 
     return enif_make_tuple2(env, ok_atom, term);
 }
@@ -475,6 +479,8 @@ encrypt_message(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
             env, olm_session_last_error(session), ERL_NIF_LATIN1);
 
         enif_release_binary(&message);
+
+        return enif_make_tuple2(env, error_atom, error_message);
     }
 
     ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
