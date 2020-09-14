@@ -46,6 +46,8 @@ defmodule Olm.NIF do
 
   def encrypt_message(_session_ref, _plaintext), do: error("encrypt_message/2")
 
+  def decrypt_message(_session_ref, _type, _cyphertext), do: error("decrypt_message/3")
+
   def utility_sha256(_string), do: error("utility_sha256/1")
 
   def utility_ed25519_verify(_key, _message, _signature), do: error("utility_ed25519_verify/3")

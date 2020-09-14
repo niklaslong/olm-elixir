@@ -43,4 +43,20 @@ defmodule Olm.Session do
       {:error, error} -> raise NIFError, error
     end
   end
+
+  @doc """
+  Decrypts a message using the session.
+  """
+  def decrypt_message(session_ref, type, cyphertext)
+      when is_reference(session_ref) and is_integer(type) do
+    case NIF.decrypt_message(session_ref, type, cyphertext) do
+      {:ok, plaintext} ->
+        plaintext
+        |> String.chunk(:printable)
+        |> List.first()
+
+      {error, error} ->
+        raise NIFError, error
+    end
+  end
 end

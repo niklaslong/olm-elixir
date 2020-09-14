@@ -4,6 +4,8 @@ defmodule Olm.SessionTest do
 
   doctest Session
 
+  ExUnit.Case.register_attribute(__MODULE__, :fixtures, accumulate: true)
+
   defp create_account(_context) do
     {account, id_key, one_time_key} = Account.create() |> generate_keys()
     %{id_key: id_key, one_time_key: one_time_key, account: account}
@@ -34,6 +36,18 @@ defmodule Olm.SessionTest do
         Session.new_outbound(context.account, context.peer_id_key, context.peer_one_time_key)
     }
 
+  defp encrypt_message(context) do
+    [%{msg_content: msg_content}] = context.registered.fixtures
+    %{pre_key_msg: Session.encrypt_message(context.outbound_session, msg_content)}
+  end
+
+  defp create_inbound_session(context) do
+    inbound_session =
+      Session.new_inbound(context.peer_account, context.pre_key_msg.cyphertext, context.id_key)
+
+    %{inbound_session: inbound_session}
+  end
+
   describe "new_outbound/3:" do
     setup [:create_account, :create_peer_account]
 
@@ -52,7 +66,7 @@ defmodule Olm.SessionTest do
     setup [:create_account, :create_peer_account, :create_outbound_session]
 
     test "returns a session which can be used to decrypt messages", context do
-      pre_key_msg = Session.encrypt_message(context.outbound_session, "this is a secret")
+      pre_key_msg = Session.encrypt_message(context.outbound_session, "This is a message")
 
       inbound_session =
         Session.new_inbound(context.peer_account, pre_key_msg.cyphertext, context.id_key)
@@ -72,6 +86,25 @@ defmodule Olm.SessionTest do
 
     @tag :skip
     test "returns base64 encoded cyphertext (message)", _context do
+    end
+  end
+
+  describe "decrypt_message/3" do
+    setup [
+      :create_account,
+      :create_peer_account,
+      :create_outbound_session,
+      :encrypt_message,
+      :create_inbound_session
+    ]
+
+    @fixtures %{msg_content: "This is a message"}
+    test "returns the decrypted message", context do
+      assert Session.decrypt_message(
+               context.inbound_session,
+               context.pre_key_msg.type,
+               context.pre_key_msg.cyphertext
+             ) == "This is a message"
     end
   end
 end
