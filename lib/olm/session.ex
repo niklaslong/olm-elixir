@@ -19,14 +19,16 @@ defmodule Olm.Session do
   @doc """
   Create a new in-bound session for sending/receiving messages from an incoming PRE_KEY message.
   """
-  def new_inbound(account_ref, message, peer_id_key \\ "")
-      when is_reference(account_ref) and is_binary(message) and is_binary(peer_id_key) do
-    peer_id_key
-    |> case do
-      "" -> NIF.create_inbound_session(account_ref, message)
-      peer_id_key -> NIF.create_inbound_session_from(account_ref, message, peer_id_key)
+  def new_inbound(account_ref, message) when is_reference(account_ref) and is_binary(message) do
+    case NIF.create_inbound_session(account_ref, message) do
+      {:ok, session_ref} -> session_ref
+      {:error, error} -> raise NIFError, error
     end
-    |> case do
+  end
+
+  def new_inbound(account_ref, message, peer_id_key)
+      when is_reference(account_ref) and is_binary(message) and is_binary(peer_id_key) do
+    case NIF.create_inbound_session_from(account_ref, message, peer_id_key) do
       {:ok, session_ref} -> session_ref
       {:error, error} -> raise NIFError, error
     end
