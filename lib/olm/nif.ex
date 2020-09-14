@@ -46,7 +46,7 @@ defmodule Olm.NIF do
 
   # def session_id(_session_ref), do: error("session_id/1")
 
-  # def match_inbound_session(_account_ref, _message), do error("match_inbound_session_from/2")
+  def match_inbound_session(_session_ref, _message), do: error("match_inbound_session/2")
 
   def match_inbound_session_from(_session_ref, _message, _peer_id_key),
     do: error("match_inbound_session_from/3")

@@ -91,12 +91,19 @@ defmodule Olm.SessionTest do
     ]
 
     @fixtures %{msg_content: "This is a message"}
-    test "returns 1 if current inbound session matches pre key message", context do
+    test "returns 1 if current inbound session matches pre key message (with id key verification)",
+         context do
       assert Session.match_inbound(
                context.inbound_session,
                context.pre_key_msg.cyphertext,
                context.id_key
              ) === 1
+    end
+
+    @fixtures %{msg_content: "This is a message"}
+    test "returns 1 if current inbound session matches pre key message (without id key verification)",
+         context do
+      assert Session.match_inbound(context.inbound_session, context.pre_key_msg.cyphertext) === 1
     end
   end
 
