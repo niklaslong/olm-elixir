@@ -65,12 +65,18 @@ defmodule Olm.SessionTest do
   describe "new_inbound/3" do
     setup [:create_account, :create_peer_account, :create_outbound_session]
 
-    test "returns a session which can be used to decrypt messages", context do
+    test "returns a session which can be used to decrypt messages (with id key)", context do
       pre_key_msg = Session.encrypt_message(context.outbound_session, "This is a message")
 
       inbound_session =
         Session.new_inbound(context.peer_account, pre_key_msg.cyphertext, context.id_key)
 
+      assert is_reference(inbound_session)
+    end
+
+    test "returns a session which can be used to decrypt messages (without id key)", context do
+      pre_key_msg = Session.encrypt_message(context.outbound_session, "This is a message")
+      inbound_session = Session.new_inbound(context.peer_account, pre_key_msg.cyphertext)
       assert is_reference(inbound_session)
     end
   end
