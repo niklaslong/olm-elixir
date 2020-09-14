@@ -382,6 +382,28 @@ create_outbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
+encrypt_message_type(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmSession* session;
+    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+
+    size_t result = olm_encrypt_message_type(session);
+
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_session_last_error(session), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    }
+
+    ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM type    = enif_make_ulong(env, result);
+
+    return enif_make_tuple2(env, ok_atom, type);
+}
+
+static ERL_NIF_TERM
 encrypt_message(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     OlmSession* session;
@@ -519,6 +541,7 @@ static ErlNifFunc nif_funcs[] = {
     {"account_max_one_time_keys", 1, account_max_one_time_keys},
     {"account_generate_one_time_keys", 2, account_generate_one_time_keys},
     {"create_outbound_session", 3, create_outbound_session},
+    {"encrypt_message_type", 1, encrypt_message_type},
     {"encrypt_message", 2, encrypt_message},
     {"utility_sha256", 1, utility_sha256},
     {"utility_ed25519_verify", 3, utility_ed25519_verify}};

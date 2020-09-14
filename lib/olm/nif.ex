@@ -37,6 +37,8 @@ defmodule Olm.NIF do
   def create_outbound_session(_account_ref, _peer_id_key, _peer_one_time_key),
     do: error("create_outbound_session/3")
 
+  def encrypt_message_type(_session_ref), do: error("encrypt_message_type/1")
+
   def encrypt_message(_session_ref, _plaintext), do: error("encrypt_message/2")
 
   # def create_inbound_session(_account_ref, _message), do: error("create_inbound_session/2")
