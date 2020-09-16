@@ -149,10 +149,6 @@ defmodule Olm.SessionTest do
       assert is_binary(message.cyphertext)
       assert message.type === 0
     end
-
-    @tag :skip
-    test "returns base64 encoded cyphertext (message)", _context do
-    end
   end
 
   describe "decrypt_message/3" do

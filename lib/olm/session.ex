@@ -34,6 +34,11 @@ defmodule Olm.Session do
     end
   end
 
+  @doc """
+  An identifier for this session. 
+
+  Will be the same for both ends of the conversation.
+  """
   def id(session_ref) when is_reference(session_ref) do
     case NIF.session_id(session_ref) do
       {:ok, id} -> id
@@ -41,6 +46,9 @@ defmodule Olm.Session do
     end
   end
 
+  @doc """
+  Checks if the pre key message is for this in-bound session.
+  """
   def match_inbound(session_ref, message) when is_reference(session_ref) and is_binary(message) do
     case NIF.match_inbound_session(session_ref, message) do
       {:ok, val} -> val
@@ -66,6 +74,9 @@ defmodule Olm.Session do
     end
   end
 
+  @doc """
+  Loads a session from a pickled base64 string.
+  """
   def unpickle(pickled_session, key) when is_binary(pickled_session) and is_binary(key) do
     case NIF.unpickle_session(pickled_session, key) do
       {:ok, session_ref} -> session_ref
