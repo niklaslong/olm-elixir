@@ -467,6 +467,34 @@ create_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
+session_id(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmSession* session;
+    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+
+    ErlNifBinary id;
+    size_t       id_length = olm_session_id_length(session);
+    enif_alloc_binary(id_length, &id);
+
+    size_t result = olm_session_id(session, id.data, id.size);
+
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_session_last_error(session), ERL_NIF_LATIN1);
+
+        enif_release_binary(&id);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    }
+
+    ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM term    = enif_make_binary(env, &id);
+
+    return enif_make_tuple2(env, ok_atom, term);
+}
+
+static ERL_NIF_TERM
 match_inbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     OlmSession* session;
@@ -819,6 +847,7 @@ static ErlNifFunc nif_funcs[] = {
     {"create_outbound_session", 3, create_outbound_session},
     {"create_inbound_session", 2, create_inbound_session},
     {"create_inbound_session_from", 3, create_inbound_session_from},
+    {"session_id", 1, session_id},
     {"match_inbound_session", 2, match_inbound_session},
     {"match_inbound_session_from", 3, match_inbound_session_from},
     {"pickle_session", 2, pickle_session},

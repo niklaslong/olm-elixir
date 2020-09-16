@@ -84,6 +84,25 @@ defmodule Olm.SessionTest do
     end
   end
 
+  describe "id/1:" do
+    setup [
+      :create_account,
+      :create_peer_account,
+      :create_outbound_session,
+      :encrypt_message,
+      :create_inbound_session
+    ]
+
+    @fixtures %{msg_content: "This is a message"}
+    test "returns session id", context do
+      outbound_id = Session.id(context.outbound_session)
+      inbound_id = Session.id(context.inbound_session)
+
+      assert is_binary(outbound_id)
+      assert outbound_id == inbound_id
+    end
+  end
+
   describe "match_inbound/3" do
     setup [
       :create_account,

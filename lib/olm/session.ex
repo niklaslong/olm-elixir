@@ -34,6 +34,13 @@ defmodule Olm.Session do
     end
   end
 
+  def id(session_ref) when is_reference(session_ref) do
+    case NIF.session_id(session_ref) do
+      {:ok, id} -> id
+      {:error, error} -> raise NIFError, error
+    end
+  end
+
   def match_inbound(session_ref, message) when is_reference(session_ref) and is_binary(message) do
     case NIF.match_inbound_session(session_ref, message) do
       {:ok, val} -> val
