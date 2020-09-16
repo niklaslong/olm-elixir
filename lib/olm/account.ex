@@ -107,4 +107,15 @@ defmodule Olm.Account do
       {:error, error} -> raise NIFError, error
     end
   end
+
+  @doc """
+  Removes the one time keys that the session used from the account.
+  """
+  def remove_one_time_keys(account_ref, session_ref)
+      when is_reference(account_ref) and is_reference(session_ref) do
+    case NIF.remove_one_time_keys(account_ref, session_ref) do
+      {:ok, _} -> :ok
+      {:error, error} -> raise NIFError, error
+    end
+  end
 end

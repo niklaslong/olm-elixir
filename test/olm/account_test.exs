@@ -1,6 +1,6 @@
 defmodule Olm.AccountTest do
   use ExUnit.Case
-  alias Olm.Account
+  alias Olm.{Account, Session}
 
   doctest Account
 
@@ -99,6 +99,31 @@ defmodule Olm.AccountTest do
 
     test "returns one time keys if return is set to true", context do
       assert context.account |> Account.generate_one_time_keys(3, true) |> is_map
+    end
+  end
+
+  describe "remove_one_time_keys/2:" do
+    setup :create_account
+
+    test "returns :ok after removing used one time keys", context do
+      peer_account = Account.create()
+
+      id_key =
+        peer_account
+        |> Account.identity_keys()
+        |> Map.get(:curve25519)
+
+      one_time_key =
+        peer_account
+        |> Account.generate_one_time_keys(1, true)
+        |> get_in([:curve25519, :AAAAAQ])
+
+      outbound_session = Session.new_outbound(context.account, id_key, one_time_key)
+      pre_key_msg = Session.encrypt_message(outbound_session, "message")
+      inbound_session = Session.new_inbound(peer_account, pre_key_msg.cyphertext)
+
+      assert :ok = Account.remove_one_time_keys(peer_account, inbound_session)
+      assert Account.one_time_keys(peer_account) == %{curve25519: %{}}
     end
   end
 end
