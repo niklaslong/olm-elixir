@@ -34,7 +34,7 @@ defmodule Olm.NIF do
   def account_generate_one_time_keys(_account_ref, _count),
     do: error("account_generate_one_time_keys/2")
 
-  # def remove_one_time_keys(_account_ref, _session_ref), do: error("remove_one_time_keys/2")
+  def remove_one_time_keys(_account_ref, _session_ref), do: error("remove_one_time_keys/2")
 
   def create_outbound_session(_account_ref, _peer_id_key, _peer_one_time_key),
     do: error("create_outbound_session/3")

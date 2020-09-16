@@ -333,6 +333,32 @@ account_generate_one_time_keys(ErlNifEnv*         env,
     return enif_make_tuple2(env, result_atom, msg);
 }
 
+static ERL_NIF_TERM
+remove_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmAccount* account;
+    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+
+    OlmSession* session;
+    enif_get_resource(env, argv[1], session_resource, (void**) &session);
+
+    size_t result = olm_remove_one_time_keys(account, session);
+
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_account_last_error(account), ERL_NIF_LATIN1);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    }
+
+    ERL_NIF_TERM result_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM msg =
+        enif_make_string(env, "Successfully removed", ERL_NIF_LATIN1);
+
+    return enif_make_tuple2(env, result_atom, msg);
+}
+
 // Sessions
 
 static ERL_NIF_TERM
@@ -844,6 +870,7 @@ static ErlNifFunc nif_funcs[] = {
     {"account_mark_keys_as_published", 1, account_mark_keys_as_published},
     {"account_max_one_time_keys", 1, account_max_one_time_keys},
     {"account_generate_one_time_keys", 2, account_generate_one_time_keys},
+    {"remove_one_time_keys", 2, remove_one_time_keys},
     {"create_outbound_session", 3, create_outbound_session},
     {"create_inbound_session", 2, create_inbound_session},
     {"create_inbound_session_from", 3, create_inbound_session_from},
