@@ -36,7 +36,8 @@ defmodule Olm.SessionTest do
         Session.new_outbound(context.account, context.peer_id_key, context.peer_one_time_key)
     }
 
-  defp pickle_session(context), do: %{pickled_session: Session.pickle(context.outbound_session, "key")}
+  defp pickle_session(context),
+    do: %{pickled_session: Session.pickle(context.outbound_session, "key")}
 
   defp encrypt_message(context) do
     [%{msg_content: msg_content}] = context.registered.fixtures

@@ -59,6 +59,13 @@ defmodule Olm.Session do
     end
   end
 
+  def unpickle(pickled_session, key) when is_binary(pickled_session) and is_binary(key) do
+    case NIF.unpickle_session(pickled_session, key) do
+      {:ok, session_ref} -> session_ref
+      {:error, error} -> raise NIFError, error
+    end
+  end
+
   @doc """
   Encrypts a message using the session.
   """

@@ -53,7 +53,7 @@ defmodule Olm.NIF do
 
   def pickle_session(_session_ref, _key), do: error("pickle_session/2")
 
-  # def unpickle_session(_pickled_session, _key), do: error("unpickle_session/2") 
+  def unpickle_session(_pickled_session, _key), do: error("unpickle_session/2")
 
   def encrypt_message_type(_session_ref), do: error("encrypt_message_type/1")
 
