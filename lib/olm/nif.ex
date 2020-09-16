@@ -51,7 +51,7 @@ defmodule Olm.NIF do
   def match_inbound_session_from(_session_ref, _message, _peer_id_key),
     do: error("match_inbound_session_from/3")
 
-  # def pickle_session(_session_ref, _key), do: error("pickle_session/2")
+  def pickle_session(_session_ref, _key), do: error("pickle_session/2")
 
   # def unpickle_session(_pickled_session, _key), do: error("unpickle_session/2") 
 

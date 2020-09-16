@@ -36,6 +36,8 @@ defmodule Olm.SessionTest do
         Session.new_outbound(context.account, context.peer_id_key, context.peer_one_time_key)
     }
 
+  defp pickle_session(context), do: %{pickled_session: Session.pickle(context.outbound_session, "key")}
+
   defp encrypt_message(context) do
     [%{msg_content: msg_content}] = context.registered.fixtures
     %{pre_key_msg: Session.encrypt_message(context.outbound_session, msg_content)}
@@ -104,6 +106,18 @@ defmodule Olm.SessionTest do
     test "returns 1 if current inbound session matches pre key message (without id key verification)",
          context do
       assert Session.match_inbound(context.inbound_session, context.pre_key_msg.cyphertext) === 1
+    end
+  end
+
+  describe "pickle_session/2:" do
+    setup [:create_account, :create_peer_account, :create_outbound_session, :pickle_session]
+
+    test "returns the pickled session as a base64 string", context do
+      assert is_binary(Session.pickle(context.outbound_session, "key"))
+    end
+
+    test "returns a reference to the unpickle session", context do
+      assert is_reference(Session.unpickle(context.pickled_session, "key"))
     end
   end
 

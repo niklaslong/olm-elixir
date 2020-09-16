@@ -50,6 +50,16 @@ defmodule Olm.Session do
   end
 
   @doc """
+  Stores a session as a base64 string.
+  """
+  def pickle(session_ref, key) when is_reference(session_ref) and is_binary(key) do
+    case NIF.pickle_session(session_ref, key) do
+      {:ok, pickled_session} -> pickled_session
+      {:error, error} -> raise NIFError, error
+    end
+  end
+
+  @doc """
   Encrypts a message using the session.
   """
   def encrypt_message(session_ref, plaintext)

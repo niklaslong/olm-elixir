@@ -537,6 +537,38 @@ match_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
+pickle_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    OlmSession* session;
+    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+
+    ErlNifBinary key;
+    enif_inspect_binary(env, argv[1], &key);
+
+    ErlNifBinary pickled;
+    size_t       pickled_length = olm_pickle_session_length(session);
+    enif_alloc_binary(pickled_length, &pickled);
+
+    size_t result = olm_pickle_session(
+        session, key.data, key.size, pickled.data, pickled.size);
+
+    if (result == olm_error()) {
+        ERL_NIF_TERM error_atom    = enif_make_atom(env, "error");
+        ERL_NIF_TERM error_message = enif_make_string(
+            env, olm_session_last_error(session), ERL_NIF_LATIN1);
+
+        enif_release_binary(&pickled);
+
+        return enif_make_tuple2(env, error_atom, error_message);
+    }
+
+    ERL_NIF_TERM ok_atom = enif_make_atom(env, "ok");
+    ERL_NIF_TERM term    = enif_make_binary(env, &pickled);
+
+    return enif_make_tuple2(env, ok_atom, term);
+}
+
+static ERL_NIF_TERM
 encrypt_message_type(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     OlmSession* session;
@@ -748,6 +780,7 @@ static ErlNifFunc nif_funcs[] = {
     {"create_inbound_session_from", 3, create_inbound_session_from},
     {"match_inbound_session", 2, match_inbound_session},
     {"match_inbound_session_from", 3, match_inbound_session_from},
+    {"pickle_session", 2, pickle_session},
     {"encrypt_message_type", 1, encrypt_message_type},
     {"encrypt_message", 2, encrypt_message},
     {"decrypt_message", 3, decrypt_message},
