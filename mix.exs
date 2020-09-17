@@ -24,7 +24,7 @@ defmodule Olm.MixProject do
   defp deps do
     [
       {:jason, "~> 1.2"},
-      {:ex_doc, "~> 0.2"}
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false}
     ]
   end
 
