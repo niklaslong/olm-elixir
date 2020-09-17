@@ -9,6 +9,8 @@ defmodule Olm.NIFError do
 end
 
 defmodule Olm.NIF do
+  @moduledoc false
+
   @on_load :load_nifs
 
   def load_nifs(), do: :erlang.load_nif('priv/olm_nif', 0)

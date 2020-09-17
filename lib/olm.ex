@@ -1,6 +1,6 @@
 defmodule Olm do
   @moduledoc """
-  Documentation for `Olm`.
+  Elixir/Erlang bindings to the olm and megolm cryptographic ratchets.  
   """
 
   alias Olm.NIF
