@@ -4,12 +4,15 @@ defmodule Olm.MixProject do
   def project do
     [
       app: :olm,
-      version: "0.1.0",
+      version: "0.1.0-rc",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       compilers: [:olm_nifs] ++ Mix.compilers(),
-      aliases: aliases()
+      aliases: aliases(),
+      description: description(),
+      docs: docs(),
+      package: package()
     ]
   end
 
@@ -30,6 +33,30 @@ defmodule Olm.MixProject do
 
   defp aliases do
     [fmt: ["format", "cmd clang-format -i c_src/*.[ch]"]]
+  end
+
+  defp description() do
+    """
+    Elixir/Erlang NIF bindings for the olm and megolm cryptographic ratchets
+    """
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      name: "Olm",
+      source_url: "https://github.com/niklaslong/olm-elixir",
+      extras: ["README.md"]
+    ]
+  end
+
+  defp package() do
+    [
+      maintainers: ["Niklas Long"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/niklaslong/olm-elixir"},
+      files: ~w(lib priv .formatter.exs mix.exs README* LICENSE* CHANGELOG* src c_src Makefile)
+    ]
   end
 end
 
