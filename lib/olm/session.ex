@@ -1,6 +1,6 @@
 defmodule Olm.Session do
   @moduledoc """
-  Functions for working with Olm Sessions
+  Functions for working with Olm Sessions.
   """
 
   alias Olm.{NIF, NIFError}
@@ -17,7 +17,7 @@ defmodule Olm.Session do
   end
 
   @doc """
-  Create a new in-bound session for sending/receiving messages from an incoming PRE_KEY message.
+  Creates a new in-bound session for sending/receiving messages from an incoming pre key message.
   """
   def new_inbound(account_ref, message) when is_reference(account_ref) and is_binary(message) do
     case NIF.create_inbound_session(account_ref, message) do
@@ -26,6 +26,9 @@ defmodule Olm.Session do
     end
   end
 
+  @doc """
+  Creates a new in-bound session for sending/receiving messages from an incoming pre key message and includes an identity key check. 
+  """
   def new_inbound(account_ref, message, peer_id_key)
       when is_reference(account_ref) and is_binary(message) and is_binary(peer_id_key) do
     case NIF.create_inbound_session_from(account_ref, message, peer_id_key) do
@@ -56,6 +59,9 @@ defmodule Olm.Session do
     end
   end
 
+  @doc """
+  Checks if the pre key message is for this in-bound session and includes an identity key check.
+  """
   def match_inbound(session_ref, message, peer_id_key)
       when is_reference(session_ref) and is_binary(message) and is_binary(peer_id_key) do
     case NIF.match_inbound_session_from(session_ref, message, peer_id_key) do
