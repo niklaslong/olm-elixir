@@ -55,7 +55,7 @@ defmodule Olm.MixProject do
       maintainers: ["Niklas Long"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/niklaslong/olm-elixir"},
-      files: ~w(lib priv .formatter.exs mix.exs README* LICENSE* CHANGELOG* src c_src Makefile)
+      files: ~w(lib priv .formatter.exs mix.exs README* LICENSE* c_src Makefile .clang-format)
     ]
   end
 end
