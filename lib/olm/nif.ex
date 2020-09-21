@@ -13,7 +13,11 @@ defmodule Olm.NIF do
 
   @on_load :load_nifs
 
-  def load_nifs(), do: :erlang.load_nif('priv/olm_nif', 0)
+  def load_nifs(),
+    do:
+      __DIR__
+      |> Path.join("../../priv/olm_nif")
+      |> :erlang.load_nif(0)
 
   def version(), do: error("version/0")
 
