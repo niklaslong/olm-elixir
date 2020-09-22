@@ -1,6 +1,7 @@
 # Olm
 
-Elixir wrapper for [Olm](https://gitlab.matrix.org/matrix-org/olm).
+Elixir wrapper for [Olm](https://gitlab.matrix.org/matrix-org/olm), an
+implementation of the Double Ratchet cryptographic ratchet.
 
 ## Installation
 
@@ -10,13 +11,12 @@ On Debian one can install it like so:
 
     apt install libolm-dev
 
-On Darwin: 
+On Darwin:
 
     brew install libolm
 
-NOTE: one must set the `ERL_ROOT` environment var, usually `/usr/local/lib/erlang/erts-version`
-
-Once this is done, the package can be installed by adding `olm` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `olm` to your list of dependencies in
+`mix.exs`:
 
 ```elixir
 def deps do
