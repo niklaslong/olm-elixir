@@ -1,21 +1,20 @@
-UNAME := $(shell uname -s)
+ARCH := $(shell uname -s)
+PREFIX ?= ./priv
 
-# Creates directory for object files.
-$(shell mkdir priv)
+ERL_INCLUDE_PATH=$(shell erl -eval 'io:format("~s~n", [lists:concat([code:root_dir(), "/erts-", erlang:system_info(version), "/include"])])' -s init stop -noshell)
 
-ifeq ($(UNAME), Linux) 
-ERL_INCLUDE_PATH=$ERL_ROOT/usr/include/
+CFLAGS ?= -fPIC -shared -I$(ERL_INCLUDE_PATH)
+LDFLAGS ?= -lolm
 
-all::
-	cc -fPIC -shared -I$(ERL_INCLUDE_PATH) \
-		-o priv/olm_nif.so c_src/olm_nif.c -lolm
+ifeq ($(ARCH), Darwin)
+	LDFLAGS += -dynamiclib -undefined dynamic_lookup
 endif
 
-ifeq ($(UNAME), Darwin) 
-ERL_INCLUDE_PATH=$(ERL_ROOT)/include
+all: $(PREFIX)/olm_nif.so
 
-all::
-	cc -fPIC -shared -I$(ERL_INCLUDE_PATH) \
-		-dynamiclib -undefined dynamic_lookup \
-		-o priv/olm_nif.so c_src/olm_nif.c -lolm
-endif
+$(PREFIX)/olm_nif.so: c_src/olm_nif.c
+	@mkdir -p "$(@D)"
+	cc $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+clean:
+	rm -rf $(PREFIX)
