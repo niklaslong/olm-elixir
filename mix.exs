@@ -65,4 +65,10 @@ defmodule Mix.Tasks.Compile.OlmNifs do
     {result, _errcode} = System.cmd("make", [], stderr_to_stdout: true)
     IO.binwrite(result)
   end
+
+  def clean do
+    if File.exists?("priv/olm_nif.so") do
+      File.rm!("priv/olm_nif.so")
+    end
+  end
 end
