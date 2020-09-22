@@ -21,7 +21,7 @@ jobs:
         otp-version: 22.2
 
     - name: Install Olm C library
-      run: sudo apt-get install libolm3
+      run: sudo apt-get update && sudo apt-get install libolm3
 
     - name: Install Dependencies
       run: mix deps.get
