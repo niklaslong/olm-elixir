@@ -1,7 +1,6 @@
-#include "erl_nif.h"
-#include <string.h>
-
+#include <erl_nif.h>
 #include <olm/olm.h>
+#include <string.h>
 
 // Resource setup
 
