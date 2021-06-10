@@ -1,11 +1,7 @@
 #include "erl_nif.h"
 #include <string.h>
 
-#include <olm/inbound_group_session.h>
 #include <olm/olm.h>
-#include <olm/outbound_group_session.h>
-#include <olm/pk.h>
-#include <olm/sas.h>
 
 // Resource setup
 
