@@ -4,23 +4,23 @@
 
 // Resource setup
 
-static ErlNifResourceType* account_resource;
-static ErlNifResourceType* session_resource;
+static ErlNifResourceType *account_resource;
+static ErlNifResourceType *session_resource;
 
 void
-account_dtor(ErlNifEnv* caller_env, void* account)
+account_dtor(ErlNifEnv *caller_env, void *account)
 {
     olm_clear_account(account);
 }
 
 void
-session_dtor(ErlNifEnv* caller_env, void* session)
+session_dtor(ErlNifEnv *caller_env, void *session)
 {
     olm_clear_session(session);
 }
 
 static int
-nif_load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info)
+nif_load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
 {
     int flags = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
 
@@ -34,7 +34,7 @@ nif_load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info)
 }
 
 static ERL_NIF_TERM
-version(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+version(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
     uint8_t major, minor, patch;
     olm_get_library_version(&major, &minor, &patch);
@@ -48,13 +48,13 @@ version(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 // Accounts
 
 static ERL_NIF_TERM
-create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+create_account(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
     size_t account_size = olm_account_size();
 
     // Allocate memory based on account_size.
-    OlmAccount* memory  = enif_alloc_resource(account_resource, account_size);
-    OlmAccount* account = olm_account(memory);
+    OlmAccount *memory  = enif_alloc_resource(account_resource, account_size);
+    OlmAccount *account = olm_account(memory);
 
     size_t random_length = olm_create_account_random_length(account);
     char   bytes[random_length];
@@ -80,15 +80,15 @@ create_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-pickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+pickle_account(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
     ErlNifBinary key;
     ErlNifBinary pickled;
 
-    OlmAccount* account;
+    OlmAccount *account;
 
     // Read args.
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
     enif_inspect_binary(env, argv[1], &key);
 
     // Allocate buffer for result.
@@ -116,7 +116,7 @@ pickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-unpickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+unpickle_account(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
     ErlNifBinary pickled, pickled_input;
     ErlNifBinary key;
@@ -130,8 +130,8 @@ unpickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     // Initialise account memory.
     size_t      account_size = olm_account_size();
-    OlmAccount* memory  = enif_alloc_resource(account_resource, account_size);
-    OlmAccount* account = olm_account(memory);
+    OlmAccount *memory  = enif_alloc_resource(account_resource, account_size);
+    OlmAccount *account = olm_account(memory);
 
     size_t result = olm_unpickle_account(
         account, key.data, key.size, pickled.data, pickled.size);
@@ -158,10 +158,10 @@ unpickle_account(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-account_identity_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+account_identity_keys(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     // Allocate memory for identity keys.
     ErlNifBinary identity_keys;
@@ -189,10 +189,10 @@ account_identity_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-account_sign(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+account_sign(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     ErlNifBinary message;
     enif_inspect_binary(env, argv[1], &message);
@@ -222,10 +222,10 @@ account_sign(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-account_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+account_one_time_keys(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     ErlNifBinary one_time_keys;
     size_t one_time_keys_length = olm_account_one_time_keys_length(account);
@@ -252,12 +252,12 @@ account_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-account_mark_keys_as_published(ErlNifEnv*         env,
+account_mark_keys_as_published(ErlNifEnv         *env,
                                int                argc,
                                const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     size_t result = olm_account_mark_keys_as_published(account);
 
@@ -278,10 +278,10 @@ account_mark_keys_as_published(ErlNifEnv*         env,
 }
 
 static ERL_NIF_TERM
-account_max_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+account_max_one_time_keys(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     size_t max = olm_account_max_number_of_one_time_keys(account);
 
@@ -292,13 +292,13 @@ account_max_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-account_generate_one_time_keys(ErlNifEnv*         env,
+account_generate_one_time_keys(ErlNifEnv         *env,
                                int                argc,
                                const ERL_NIF_TERM argv[])
 {
     // Get args.
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     size_t count;
     enif_get_ulong(env, argv[1], &count);
@@ -329,13 +329,13 @@ account_generate_one_time_keys(ErlNifEnv*         env,
 }
 
 static ERL_NIF_TERM
-remove_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+remove_one_time_keys(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
-    OlmSession* session;
-    enif_get_resource(env, argv[1], session_resource, (void**) &session);
+    OlmSession *session;
+    enif_get_resource(env, argv[1], session_resource, (void **) &session);
 
     size_t result = olm_remove_one_time_keys(account, session);
 
@@ -357,10 +357,10 @@ remove_one_time_keys(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 // Sessions
 
 static ERL_NIF_TERM
-create_outbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+create_outbound_session(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     ErlNifBinary peer_id_key;
     enif_inspect_binary(env, argv[1], &peer_id_key);
@@ -370,8 +370,8 @@ create_outbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     // Allocate new session
     size_t      session_size = olm_session_size();
-    OlmSession* memory  = enif_alloc_resource(session_resource, session_size);
-    OlmSession* session = olm_session(memory);
+    OlmSession *memory  = enif_alloc_resource(session_resource, session_size);
+    OlmSession *session = olm_session(memory);
 
     size_t random_length = olm_create_outbound_session_random_length(session);
     char   bytes[random_length];
@@ -403,10 +403,10 @@ create_outbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-create_inbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+create_inbound_session(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     ErlNifBinary cyphertext, cyphertext_input;
     enif_inspect_binary(env, argv[1], &cyphertext_input);
@@ -415,8 +415,8 @@ create_inbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     // Allocate new session
     size_t      session_size = olm_session_size();
-    OlmSession* memory  = enif_alloc_resource(session_resource, session_size);
-    OlmSession* session = olm_session(memory);
+    OlmSession *memory  = enif_alloc_resource(session_resource, session_size);
+    OlmSession *session = olm_session(memory);
 
     size_t result = olm_create_inbound_session(
         session, account, cyphertext.data, cyphertext.size);
@@ -442,10 +442,10 @@ create_inbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-create_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+create_inbound_session_from(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmAccount* account;
-    enif_get_resource(env, argv[0], account_resource, (void**) &account);
+    OlmAccount *account;
+    enif_get_resource(env, argv[0], account_resource, (void **) &account);
 
     ErlNifBinary cyphertext, cyphertext_input;
     enif_inspect_binary(env, argv[1], &cyphertext_input);
@@ -457,8 +457,8 @@ create_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     // Allocate new session
     size_t      session_size = olm_session_size();
-    OlmSession* memory  = enif_alloc_resource(session_resource, session_size);
-    OlmSession* session = olm_session(memory);
+    OlmSession *memory  = enif_alloc_resource(session_resource, session_size);
+    OlmSession *session = olm_session(memory);
 
     size_t result = olm_create_inbound_session_from(session,
                                                     account,
@@ -488,10 +488,10 @@ create_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-session_id(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+session_id(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmSession* session;
-    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+    OlmSession *session;
+    enif_get_resource(env, argv[0], session_resource, (void **) &session);
 
     ErlNifBinary id;
     size_t       id_length = olm_session_id_length(session);
@@ -516,10 +516,10 @@ session_id(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-match_inbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+match_inbound_session(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmSession* session;
-    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+    OlmSession *session;
+    enif_get_resource(env, argv[0], session_resource, (void **) &session);
 
     ErlNifBinary cyphertext, cyphertext_input;
     enif_inspect_binary(env, argv[1], &cyphertext_input);
@@ -548,10 +548,10 @@ match_inbound_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-match_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+match_inbound_session_from(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmSession* session;
-    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+    OlmSession *session;
+    enif_get_resource(env, argv[0], session_resource, (void **) &session);
 
     ErlNifBinary cyphertext, cyphertext_input;
     enif_inspect_binary(env, argv[1], &cyphertext_input);
@@ -586,10 +586,10 @@ match_inbound_session_from(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-pickle_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+pickle_session(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmSession* session;
-    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+    OlmSession *session;
+    enif_get_resource(env, argv[0], session_resource, (void **) &session);
 
     ErlNifBinary key;
     enif_inspect_binary(env, argv[1], &key);
@@ -618,7 +618,7 @@ pickle_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-unpickle_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+unpickle_session(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
     ErlNifBinary pickled, pickled_input;
     ErlNifBinary key;
@@ -632,8 +632,8 @@ unpickle_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
     // Alloc memory
     size_t      session_size = olm_session_size();
-    OlmSession* memory  = enif_alloc_resource(session_resource, session_size);
-    OlmSession* session = olm_session(memory);
+    OlmSession *memory  = enif_alloc_resource(session_resource, session_size);
+    OlmSession *session = olm_session(memory);
 
     size_t result = olm_unpickle_session(
         session, key.data, key.size, pickled.data, pickled.size);
@@ -659,10 +659,10 @@ unpickle_session(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-encrypt_message_type(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+encrypt_message_type(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmSession* session;
-    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+    OlmSession *session;
+    enif_get_resource(env, argv[0], session_resource, (void **) &session);
 
     size_t result = olm_encrypt_message_type(session);
 
@@ -681,10 +681,10 @@ encrypt_message_type(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-encrypt_message(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+encrypt_message(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmSession* session;
-    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+    OlmSession *session;
+    enif_get_resource(env, argv[0], session_resource, (void **) &session);
 
     ErlNifBinary plaintext;
     enif_inspect_binary(env, argv[1], &plaintext);
@@ -721,10 +721,10 @@ encrypt_message(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-decrypt_message(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+decrypt_message(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    OlmSession* session;
-    enif_get_resource(env, argv[0], session_resource, (void**) &session);
+    OlmSession *session;
+    enif_get_resource(env, argv[0], session_resource, (void **) &session);
 
     size_t type;
     enif_get_ulong(env, argv[1], &type);
@@ -769,15 +769,15 @@ decrypt_message(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 // Utility
 
 static ERL_NIF_TERM
-utility_sha256(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+utility_sha256(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
     // Args
     ErlNifBinary input;
     enif_inspect_binary(env, argv[0], &input);
 
     size_t      utility_size = olm_utility_size();
-    OlmUtility* memory       = enif_alloc(utility_size);
-    OlmUtility* utility      = olm_utility(memory);
+    OlmUtility *memory       = enif_alloc(utility_size);
+    OlmUtility *utility      = olm_utility(memory);
 
     ErlNifBinary output;
     size_t       output_length = olm_sha256_length(utility);
@@ -806,7 +806,7 @@ utility_sha256(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ERL_NIF_TERM
-utility_ed25519_verify(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+utility_ed25519_verify(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
     ErlNifBinary key;
     ErlNifBinary message;
@@ -820,8 +820,8 @@ utility_ed25519_verify(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     memcpy(signature.data, signature_input.data, signature_input.size);
 
     size_t      utility_size = olm_utility_size();
-    OlmUtility* memory       = enif_alloc(utility_size);
-    OlmUtility* utility      = olm_utility(memory);
+    OlmUtility *memory       = enif_alloc(utility_size);
+    OlmUtility *utility      = olm_utility(memory);
 
     size_t result = olm_ed25519_verify(utility,
                                        key.data,
