@@ -9,7 +9,6 @@ ColumnLimit: 80
 
 SortIncludes: true
 
-DerivePointerAlignment: false
 PointerAlignment: Right
 
 SpaceAfterCStyleCast: true
