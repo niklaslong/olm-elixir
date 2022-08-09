@@ -26,8 +26,8 @@ defmodule Olm.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:jason, "~> 1.2"},
-      {:ex_doc, "~> 0.22", only: :dev, runtime: false}
+      {:jason, "~> 1.3"},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false}
     ]
   end
 
