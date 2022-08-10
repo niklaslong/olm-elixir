@@ -15,6 +15,13 @@ On Darwin:
 
     brew install libolm
 
+If you're on Apple Silicon you may also need to (see https://github.com/niklaslong/olm-elixir/issues/35):
+
+```
+export CPATH=/opt/homebrew/include
+export LIBRARY_PATH=/opt/homebrew/lib
+```
+
 The package can be installed by adding `olm` to your list of dependencies in
 `mix.exs`:
 
